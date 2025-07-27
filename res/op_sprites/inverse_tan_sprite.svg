@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="10mm"
+   height="10mm"
+   viewBox="0 0 10 10"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
+   sodipodi:docname="inverse_tan_sprite.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="15.577906"
+     inkscape:cx="19.932076"
+     inkscape:cy="24.586103"
+     inkscape:window-width="1552"
+     inkscape:window-height="981"
+     inkscape:window-x="131"
+     inkscape:window-y="38"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     showgrid="true">
+    <inkscape:grid
+       id="grid1"
+       units="mm"
+       originx="0"
+       originy="0"
+       spacingx="0.99999997"
+       spacingy="0.99999997"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       d="M 2.561703,6.632863 H 1.062501 V 6.2453142 H 1.5596853 V 3.2239634 H 1.062501 V 2.8364146 H 2.561703 V 3.2239634 H 2.0645187 V 6.2453142 H 2.561703 Z M 6.1286818,3.2851553 H 4.772261 V 6.632863 H 4.2674277 V 3.2851553 H 2.9110069 V 2.8364146 H 6.1286818 Z M 9.5350316,6.632863 H 8.9103641 L 7.1103019,3.2367117 V 6.632863 H 6.6386142 V 2.8364146 H 7.4213608 L 9.0633439,5.936805 V 2.8364146 h 0.4716877 z"
+       id="text1"
+       style="font-size:5.22171px;fill:#1a1a1a;stroke-width:0.435142"
+       transform="scale(0.94445339,1.0588135)"
+       aria-label="ITN" />
+  </g>
+</svg>

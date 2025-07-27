@@ -1,0 +1,25 @@
+{
+  "slug": "octoplus",
+  "name": "Octoplus",
+  "version": "2.6.4",
+  "license": "proprietary",
+  "brand": "Wiring Squad",
+  "author": "Rushil Narang",
+  "authorEmail": "",
+  "authorUrl": "",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "octoplus",
+      "name": "Octoplus",
+      "description": "rectifier",
+      "tags": [
+        "effect"
+      ]
+    }
+  ]
+}
