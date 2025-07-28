@@ -123,7 +123,7 @@ PolySample PolySample::operator/(const PolySample& other) const {
 
 
 //this shit is garbage, replace it with an actual deep simd implementation
-PolySample PolySample::operator>=(const PolySample& other){
+PolySample PolySample::operator>=(const PolySample& other) const{
     PolySample result;
     result.chans0_3 = (this->chans0_3 >= other.chans0_3);
     result.chans4_7 = (this->chans4_7 >= other.chans4_7);
@@ -132,7 +132,7 @@ PolySample PolySample::operator>=(const PolySample& other){
     return result;
 }
 
-PolySample PolySample::operator<=(const PolySample& other){
+PolySample PolySample::operator<=(const PolySample& other) const{
     PolySample result;
     result.chans0_3 = (this->chans0_3 <= other.chans0_3);
     result.chans4_7 = (this->chans4_7 <= other.chans4_7);
@@ -143,32 +143,58 @@ PolySample PolySample::operator<=(const PolySample& other){
 
 
 
-PolySample PolySample::sin(PolySample& arg){
-    arg.chans0_3 = simd::sin(arg.chans0_3);
-    arg.chans4_7 = simd::sin(arg.chans4_7);
-    arg.chans8_11 = simd::sin(arg.chans8_11);
-    arg.chans12_15 = simd::sin(arg.chans12_15);
+PolySample PolySample::sin(PolySample arg){
+    PolySample result;
+    result.chans0_3 = simd::sin(arg.chans0_3);
+    result.chans4_7 = simd::sin(arg.chans4_7);
+    result.chans8_11 = simd::sin(arg.chans8_11);
+    result.chans12_15 = simd::sin(arg.chans12_15);
+    return result;
 }
 
-PolySample PolySample::cos(PolySample& arg){
-    arg.chans0_3 = simd::cos(arg.chans0_3);
-    arg.chans4_7 = simd::cos(arg.chans4_7);
-    arg.chans8_11 = simd::cos(arg.chans8_11);
-    arg.chans12_15 = simd::cos(arg.chans12_15);
+PolySample PolySample::cos(PolySample arg){
+    PolySample result;
+    result.chans0_3 = simd::cos(arg.chans0_3);
+    result.chans4_7 = simd::cos(arg.chans4_7);
+    result.chans8_11 = simd::cos(arg.chans8_11);
+    result.chans12_15 = simd::cos(arg.chans12_15);
+    return result;
 }
 
-PolySample PolySample::tan(PolySample& arg){
-    arg.chans0_3 = simd::tan(arg.chans0_3);
-    arg.chans4_7 = simd::tan(arg.chans4_7);
-    arg.chans8_11 = simd::tan(arg.chans8_11);
-    arg.chans12_15 = simd::tan(arg.chans12_15);
+PolySample PolySample::tan(PolySample arg){
+    PolySample result;
+    result.chans0_3 = simd::tan(arg.chans0_3);
+    result.chans4_7 = simd::tan(arg.chans4_7);
+    result.chans8_11 = simd::tan(arg.chans8_11);
+    result.chans12_15 = simd::tan(arg.chans12_15);
+    return result;
 }
 
-PolySample PolySample::atan(PolySample& arg){
-    arg.chans0_3 = simd::atan(arg.chans0_3);
-    arg.chans4_7 = simd::atan(arg.chans4_7);
-    arg.chans8_11 = simd::atan(arg.chans8_11);
-    arg.chans12_15 = simd::atan(arg.chans12_15);
+PolySample PolySample::atan(PolySample arg){
+    PolySample result;
+    result.chans0_3 = simd::atan(arg.chans0_3);
+    result.chans4_7 = simd::atan(arg.chans4_7);
+    result.chans8_11 = simd::atan(arg.chans8_11);
+    result.chans12_15 = simd::atan(arg.chans12_15);
+    return result;;
+}
+
+PolySample PolySample::pow(PolySample arg, float p){
+    PolySample result;
+    result.chans0_3 = simd::pow(arg.chans0_3, p);
+    result.chans4_7 = simd::pow(arg.chans4_7, p);
+    result.chans8_11 = simd::pow(arg.chans8_11, p);
+    result.chans12_15 = simd::pow(arg.chans12_15, p);
+    return result;
+}
+
+PolySample PolySample::pow(PolySample arg, PolySample p){
+    PolySample result;
+    result.chans0_3 = simd::pow(arg.chans0_3, p.chans0_3);
+    result.chans4_7 = simd::pow(arg.chans4_7, p.chans4_7);
+    result.chans8_11 = simd::pow(arg.chans8_11, p.chans8_11);
+    result.chans12_15 = simd::pow(arg.chans12_15, p.chans12_15);
+    return result;
 }
 
 

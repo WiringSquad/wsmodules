@@ -51,20 +51,24 @@ struct PolySample {
 
     //>= and <= here
 
-    PolySample operator>=(const PolySample& other);
+    PolySample operator>=(const PolySample& other) const;
 
-    PolySample operator<=(const PolySample& other);
+    PolySample operator<=(const PolySample& other) const;
 
     //TODO: add simd math funcs
     //add conversions to and from float[16] just in case
 
-    PolySample sin(PolySample& arg);
+    static PolySample sin(PolySample arg);
 
-    PolySample cos(PolySample& arg);
+    static PolySample cos(PolySample arg);
 
-    PolySample tan(PolySample& arg);
+    static PolySample tan(PolySample arg);
 
-    PolySample atan(PolySample& arg);
+    static PolySample atan(PolySample arg);
+
+    static PolySample pow(PolySample arg, float p);
+    
+    static PolySample pow(PolySample arg, PolySample p);
     
     //backwards finite difference
     PolySample naive_bfd(PolySample lastSample, PolySample currentSample, float betwTime);

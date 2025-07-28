@@ -23,3 +23,7 @@ PolySample PolySampleBuffer::naiveBFD(float betwTime){
 PolySample PolySampleBuffer::naiveSecondOrderBFD(float betwTime){
     return (polyBuffer[2] - polyBuffer[1]*2 + polyBuffer[0]) / (betwTime * betwTime);
 }
+
+const PolySample& PolySampleBuffer::operator[](size_t index) const{
+    return polyBuffer[index];
+}

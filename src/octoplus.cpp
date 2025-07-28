@@ -5,6 +5,8 @@
 #include "FoldUnit.hpp"
 #include "FoldUnitOscilloscope.hpp"
 #include "ThreeStateCheckbox.hpp"
+#include "PolyFilter.hpp"
+
 
 struct SwapButton : ParamWidget {
     ParamQuantity* Bool1 = nullptr;
@@ -99,6 +101,9 @@ struct Octoplus : Module {
         PREFOLD_THRESH_DROP_PARAM,
         PREFOLD_CROSS_LENGTH_PARAM,
 
+        PREFOLD_FILTER_CUTOFF_PARAM,
+        PREFOLD_FILTER_RESONANCE_PARAM,
+
         //rect knob params
         RECT_GAIN_PARAM,
         RECT_PASSES_PARAM, 
@@ -151,6 +156,9 @@ struct Octoplus : Module {
         POSTFOLD_DISPERSE_PARAM,
         POSTFOLD_THRESH_DROP_PARAM,
         POSTFOLD_CROSS_LENGTH_PARAM,
+
+        POSTFOLD_FILTER_CUTOFF_PARAM,
+        POSTFOLD_FILTER_RESONANCE_PARAM,
 
         //output params
         MASTER_OUT_GAIN_PARAM,
@@ -242,6 +250,9 @@ struct Octoplus : Module {
         configParam(PREFOLD_THRESH_DROP_PARAM, 0, 10, 5, "Prefold Thresh Drop");
         configParam(PREFOLD_CROSS_LENGTH_PARAM, 0, 10, 5, "Prefold Cross Length");
 
+        configParam(PREFOLD_FILTER_CUTOFF_PARAM, 0, 4, 4, "Prefold Filter Cutoff");
+        configParam(PREFOLD_FILTER_RESONANCE_PARAM, 0, 1, 0.707, "Prefold Filter Resonance");
+
         configParam(RECT_GAIN_PARAM, 0, 10, 5, "Rect Gain");
         configParam(RECT_PASSES_PARAM, 0, 10, 5, "Rect Passes");
         configParam(RECT_BLEND_PARAM, 0, 10, 5, "Rect Blend");
@@ -285,6 +296,9 @@ struct Octoplus : Module {
         configParam(POSTFOLD_DISPERSE_PARAM, 0, 10, 5, "Postfold Disperse");
         configParam(POSTFOLD_THRESH_DROP_PARAM, 0, 10, 5, "Postfold Thresh Drop");
         configParam(POSTFOLD_CROSS_LENGTH_PARAM, 0, 10, 5, "Postfold Cross Length");
+
+        configParam(POSTFOLD_FILTER_CUTOFF_PARAM, 0, 4, 4, "Postfold Filter Cutoff");
+        configParam(POSTFOLD_FILTER_RESONANCE_PARAM, 0, 1, 0.707, "Postfold Filter Resonance");
 
         configParam(MASTER_OUT_GAIN_PARAM, 0, 10, 5, "Master Gain");
         configParam(MASTER_OUT_PAN_PARAM, 0, 10, 5, "Master Pan");
@@ -405,12 +419,20 @@ struct Octoplus : Module {
     FoldUnit preFold;
     FoldUnit postFold;
 
+    
+
     float gain;
     float thresh;
     float shift;
     float drop;
 
     bool trues[4];
+
+    PolyFilter prefoldFilter;
+    PolyFilter postfoldFilter;
+
+    PolySample leftPrefoldFilterResult;
+    PolySample rightPrefoldFilterResult;
 
 	void process(const ProcessArgs& args) override {
         //shift cached values back
@@ -466,13 +488,30 @@ struct Octoplus : Module {
 
         leftFoldOutput = preFold.multiFold(leftMainPrefoldInput, thresh, gain, shift, drop, trues);
         rightFoldOutput = preFold.multiFold(rightMainPrefoldInput, thresh, gain, shift, drop, trues);
+        //leftFoldOutput = leftMainPrefoldInput;
+        //rightFoldOutput = rightMainPrefoldInput;
 
-        //bias compensation
+
+
+        //bias compensation?
         //leftFoldOutput = leftFoldOutput - (leftOrMonoMainPrebias * params[MAIN_PREBIAS_EXT_GAIN_PARAM].getValue());
         //rightFoldOutput = rightFoldOutput - (rightMainPrebias * params[MAIN_PREBIAS_EXT_GAIN_PARAM].getValue());
 
-        leftFoldOutput.polySampleToOutput(outputs[MASTER_LEFT_OR_MONO_OUTPUT]);
-        rightFoldOutput.polySampleToOutput(outputs[MASTER_RIGHT_OUTPUT]);
+        float rawCutoff = params[PREFOLD_FILTER_CUTOFF_PARAM].getValue(); // repl
+        float rawResonance = params[PREFOLD_FILTER_RESONANCE_PARAM].getValue();
+        
+        //refactor this, it's garbage. cutoff is exponentially mapped here, but resonance is mapped in the method, what a pain
+        prefoldFilter.updateParams(2 * pow(10, rawCutoff), rawResonance);
+        prefoldFilter.updateDownstreamParams();
+
+        prefoldFilter.updateCoefs_AllTypes(PolyFilterState::LOWPASS);
+
+        leftPrefoldFilterResult = prefoldFilter.process(leftFoldOutput);
+        rightPrefoldFilterResult = prefoldFilter.process(rightFoldOutput);
+
+        //refactor this trash
+        leftPrefoldFilterResult.polySampleToOutput(outputs[MASTER_LEFT_OR_MONO_OUTPUT]);
+        rightPrefoldFilterResult.polySampleToOutput(outputs[MASTER_RIGHT_OUTPUT]);
 
         //DEBUG(leftMainPrefoldInput.toString().c_str());
 
@@ -571,6 +610,9 @@ struct OctoplusWidget : ModuleWidget {
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 30)), module, Octoplus::PREFOLD_DISPERSE_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 40)), module, Octoplus::PREFOLD_THRESH_DROP_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 50)), module, Octoplus::PREFOLD_CROSS_LENGTH_PARAM));
+        
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 120)), module, Octoplus::PREFOLD_FILTER_CUTOFF_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(50, 120)), module, Octoplus::PREFOLD_FILTER_RESONANCE_PARAM));
 
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(80, 110)), module, Octoplus::RECT_GAIN_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(90, 110)), module, Octoplus::RECT_PASSES_PARAM));
@@ -735,6 +777,9 @@ struct OctoplusWidget : ModuleWidget {
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 30)), module, Octoplus::POSTFOLD_DISPERSE_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 40)), module, Octoplus::POSTFOLD_THRESH_DROP_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 50)), module, Octoplus::POSTFOLD_CROSS_LENGTH_PARAM));
+
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 120)), module, Octoplus::POSTFOLD_FILTER_CUTOFF_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(150, 120)), module, Octoplus::POSTFOLD_FILTER_RESONANCE_PARAM));
 
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(175, 25)), module, Octoplus::MASTER_OUT_GAIN_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(185, 25)), module, Octoplus::MASTER_OUT_PAN_PARAM));

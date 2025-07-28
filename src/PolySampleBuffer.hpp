@@ -13,4 +13,6 @@ struct PolySampleBuffer{
     PolySample naiveBFD(float betwTime);
 
     PolySample naiveSecondOrderBFD(float betwTime);
+
+    const PolySample& operator[](size_t index) const;
 };
