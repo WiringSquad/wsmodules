@@ -67,16 +67,20 @@ struct PolySample {
     static PolySample atan(PolySample arg);
 
     static PolySample pow(PolySample arg, float p);
-    
+
     static PolySample pow(PolySample arg, PolySample p);
     
     //backwards finite difference
-    PolySample naive_bfd(PolySample lastSample, PolySample currentSample, float betwTime);
+    static PolySample naive_bfd(PolySample lastSample, PolySample currentSample, float betwTime);
 
     //second order backwards finite difference
-    PolySample naive_second_order_bfd(PolySample twoSamplesAgo, PolySample lastSample, PolySample currentSample, float betwTime);
+    static PolySample naive_second_order_bfd(PolySample twoSamplesAgo, PolySample lastSample, PolySample currentSample, float betwTime);
 
     static PolySample ifelse(PolySample mask, PolySample a, PolySample b);
+
+    static PolySample crossfade(PolySample a, PolySample b, PolySample p);
+
+    static PolySample crossfade(PolySample a, PolySample b, float p);
 
     
     

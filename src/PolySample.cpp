@@ -218,4 +218,23 @@ PolySample PolySample::ifelse(PolySample mask, PolySample a, PolySample b){
     
 }
 
+PolySample PolySample::crossfade(PolySample a, PolySample b, PolySample p){
+    PolySample result;
+    result.chans0_3 = simd::crossfade(a.chans0_3, b.chans0_3, p.chans0_3);
+    result.chans4_7 = simd::crossfade(a.chans4_7, b.chans4_7, p.chans4_7);
+    result.chans8_11 = simd::crossfade(a.chans8_11, b.chans8_11, p.chans8_11);
+    result.chans12_15 = simd::crossfade(a.chans12_15, b.chans12_15, p.chans12_15);
+    return result;
+}
+
+PolySample PolySample::crossfade(PolySample a, PolySample b, float p){
+    PolySample result;
+    PolySample pSample(p);
+    result.chans0_3 = simd::crossfade(a.chans0_3, b.chans0_3, pSample.chans0_3);
+    result.chans4_7 = simd::crossfade(a.chans4_7, b.chans4_7, pSample.chans4_7);
+    result.chans8_11 = simd::crossfade(a.chans8_11, b.chans8_11, pSample.chans8_11);
+    result.chans12_15 = simd::crossfade(a.chans12_15, b.chans12_15, pSample.chans12_15);
+    return result;
+}
+
 

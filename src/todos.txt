@@ -1,0 +1,45 @@
+quick todos:
+single pole/PolyFilterCascade (optional)
+filter nonlinearities (optional)
+
+folder disperse
+folder delay
+
+rect unit
+
+octop mix knob
+
+ORGANIZED TODOS:
+. overload boolean PolySample mask operators (if unavailable)
+. update ScrollableDisplay, current ScrollerData is too bulky
+. move submodule UI controls into submodule objects
+. connect all controls and datapaths
+. DATAPATH DONE! but then...
+. add PolyResampler/high quality derivatives
+. manually add asin and acos PolySample definitions
+. optionally add log, exp, sqrt to ops
+. add dispersion and trigger delay settings to wavefolders
+. add differentiator sensing to end of wavefolders and mix filtering in if derivs are too high... maybe
+. waveshape/replace???
+. add rectifier forward integration capability
+. add PolyFilterCascade and pole count adjustment
+. maybe add peak and shelving filters, marginal chance for phaser and comb filters
+. write new ScrollableDisplay knobs. this includes horizontal scrolling for pole adjustment
+. possibly collect all poly stuff into a PolyUtils file
+. add nonlinearities to PolyFilter feedback path?
+. accessibility port (likely to get cut)
+. mix knob
+. write detailed manual
+. get feedback (optional)
+. professionalize UI
+. release fully
+
+PROPOSAL: PolySignalUtility
+Utility for generating polyphonic control signals. 
+can generate ascending, descending, nonlinear polyphonic patterns.
+can be restricted to a certain number of channels.
+
+PROPOSAL: TransActor
+Utility to generate the transfer function/frequency and phase responses of a plugin. Plugin Doctor esque
+
+PROPOSAL: Release folder and filter as standalone modules
