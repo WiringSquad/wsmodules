@@ -4,7 +4,10 @@
 #include "PolySampleBuffer.hpp"
 
 enum class PolyFilterState{
-    LOWPASS,
+    LOWPASS_1P,
+    HIGHPASS_1P,
+    LOWPASS_2P,
+    HIGHPASS_2P,
     HIGHPASS,
     BANDPASS,
     NOTCH,
@@ -12,6 +15,7 @@ enum class PolyFilterState{
 };
 
 struct PolyFilter{
+    PolySample a0;
     PolySample a1;
     PolySample a2;
     PolySample b0;
@@ -26,6 +30,8 @@ struct PolyFilter{
     PolySample cos_omega0;
     PolySample sin_omega0;
     PolySample alpha;
+    PolySample alpha_1p;
+    PolySample alpha_1p_hpf;
 
     PolySample Q;
     float fs;
@@ -36,7 +42,7 @@ struct PolyFilter{
     
     void updateCoefs(float A1, float A2, float B0, float B1, float B2);
 
-    void updateCoefs(PolySample A1, PolySample A2, PolySample B0, PolySample B1, PolySample B2);
+    void updateCoefs(PolySample A0, PolySample A1, PolySample A2, PolySample B0, PolySample B1, PolySample B2);
 
     void updateCoefsNormalized(PolySample A0, PolySample A1, PolySample A2, PolySample B0, PolySample B1, PolySample B2);
 

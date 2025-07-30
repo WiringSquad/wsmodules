@@ -69,6 +69,8 @@ struct PolySample {
     static PolySample pow(PolySample arg, float p);
 
     static PolySample pow(PolySample arg, PolySample p);
+
+    static PolySample exp(PolySample arg);
     
     //backwards finite difference
     static PolySample naive_bfd(PolySample lastSample, PolySample currentSample, float betwTime);

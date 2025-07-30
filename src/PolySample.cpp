@@ -197,6 +197,15 @@ PolySample PolySample::pow(PolySample arg, PolySample p){
     return result;
 }
 
+PolySample PolySample::exp(PolySample arg){
+    PolySample result;
+    result.chans0_3 = simd::exp(arg.chans0_3);
+    result.chans4_7 = simd::exp(arg.chans4_7);
+    result.chans8_11 = simd::exp(arg.chans8_11);
+    result.chans12_15 = simd::exp(arg.chans12_15);
+    return result;
+}
+
 
 //backwards finite difference
 PolySample PolySample::naive_bfd(PolySample lastSample, PolySample currentSample, float betwTime){

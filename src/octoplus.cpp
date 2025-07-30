@@ -6,85 +6,9 @@
 #include "FoldUnitOscilloscope.hpp"
 #include "ThreeStateCheckbox.hpp"
 #include "PolyFilter.hpp"
+#include "SwapButton.hpp"
 
 
-struct SwapButton : ParamWidget {
-    ParamQuantity* Bool1 = nullptr;
-    ParamQuantity* LHS1 = nullptr;
-    ParamQuantity* Comp1 = nullptr;
-    ParamQuantity* RHS1 = nullptr;
-    ParamQuantity* Bool2 = nullptr;
-    ParamQuantity* LHS2 = nullptr;
-    ParamQuantity* Comp2 = nullptr;
-    ParamQuantity* RHS2 = nullptr;
-    
-    void setPtrs(ParamQuantity* bool1, ParamQuantity* lhs1, ParamQuantity* comp1, ParamQuantity* rhs1,
-                    ParamQuantity* bool2, ParamQuantity* lhs2, ParamQuantity* comp2, ParamQuantity* rhs2) {
-        Bool1 = bool1;
-        LHS1 = lhs1;
-        Comp1 = comp1;
-        RHS1 = rhs1;
-        Bool2 = bool2;
-        LHS2 = lhs2;
-        Comp2 = comp2;
-        RHS2 = rhs2;
-    }
-    
-    void swap(){
-        if(Bool1 && Bool2){
-            float temp = Bool1->getValue();
-            Bool1->setValue(Bool2->getValue());
-            Bool2->setValue(temp);
-        }
-        if(LHS1 && LHS2 && Comp1 && Comp2 && RHS1 && RHS2){
-            float temp = LHS1->getValue();
-            LHS1->setValue(LHS2->getValue());
-            LHS2->setValue(temp);
-
-            temp = Comp1->getValue();
-            Comp1->setValue(Comp2->getValue());
-            Comp2->setValue(temp);
-
-            temp = RHS1->getValue();
-            RHS1->setValue(RHS2->getValue());
-            RHS2->setValue(temp);
-        }
-    }
-
-    SwapButton() {
-        box.size = mm2px(Vec(10, 10));
-    }
-
-    void onDragStart(const DragStartEvent& e) override {
-        e.consume(this);
-        getParamQuantity()->setValue(1.f); // Set the parameter to 1 when dragging starts
-    }
-
-    void onDragEnd(const DragEndEvent& e) override {
-        e.consume(this);
-        getParamQuantity()->setValue(0.f); // Reset the parameter to 0 when dragging ends
-    }
-
-    void onDragDrop(const DragDropEvent& e) override {
-        e.consume(this);
-        swap();
-    }
-
-    void draw(const DrawArgs& args) override {
-        BNDwidgetState state = BND_DEFAULT;
-        if (APP->event->hoveredWidget == this)
-            state = BND_HOVER;
-        if (APP->event->draggedWidget == this)
-            state = BND_ACTIVE;
-
-        NVGcontext *vg = args.vg;
-        nvgBeginPath(vg);
-        nvgFillColor(vg, nvgRGB(0, 255, 0));
-        nvgRect(vg, 0, 0, mm2px(Vec(10, 10)).x, mm2px(Vec(10, 10)).y); 
-        nvgFill(vg);
-    }
-
-};
 
 struct Octoplus : Module {
 	enum ParamId {
@@ -430,9 +354,14 @@ struct Octoplus : Module {
 
     PolyFilter prefoldFilter;
     PolyFilter postfoldFilter;
+    PolyFilter dcBlocker;
 
     PolySample leftPrefoldFilterResult;
     PolySample rightPrefoldFilterResult;
+
+    
+    PolySample dcBlockFreq;
+    PolySample dcBlockRes;
 
 	void process(const ProcessArgs& args) override {
         //shift cached values back
@@ -504,10 +433,19 @@ struct Octoplus : Module {
         prefoldFilter.updateParams(2 * pow(10, rawCutoff), rawResonance);
         prefoldFilter.updateDownstreamParams();
 
-        prefoldFilter.updateCoefs_AllTypes(PolyFilterState::LOWPASS);
+        prefoldFilter.updateCoefs_AllTypes(PolyFilterState::LOWPASS_2P);
 
         leftPrefoldFilterResult = prefoldFilter.process(leftFoldOutput);
         rightPrefoldFilterResult = prefoldFilter.process(rightFoldOutput);
+
+        dcBlockFreq = 15;
+        dcBlockRes = sqrt(2) / 2;
+        dcBlocker.updateParams(dcBlockFreq, dcBlockRes);
+        dcBlocker.updateDownstreamParams();
+        dcBlocker.updateCoefs_AllTypes(PolyFilterState::HIGHPASS_2P);
+        
+        dcBlocker.process(leftPrefoldFilterResult);
+        dcBlocker.process(rightPrefoldFilterResult);
 
         //refactor this trash
         leftPrefoldFilterResult.polySampleToOutput(outputs[MASTER_LEFT_OR_MONO_OUTPUT]);

@@ -15,7 +15,7 @@ void PolyFilter::updateCoefs(float A1, float A2, float B0, float B1, float B2){
     b2 = B2;
 }
 
-void PolyFilter::updateCoefs(PolySample A1, PolySample A2, PolySample B0, PolySample B1, PolySample B2){
+void PolyFilter::updateCoefs(PolySample A0, PolySample A1, PolySample A2, PolySample B0, PolySample B1, PolySample B2){
     a1 = A1;
     a2 = A2;
     b0 = B0;
@@ -52,16 +52,27 @@ void PolyFilter::updateDownstreamParams(){
     cos_omega0 = PolySample::cos(omega0);
     sin_omega0 = PolySample::sin(omega0);
     alpha = sin_omega0 / (Q * 2);
+    //alpha_1p = omega0 / (omega0 + fs);
+    alpha_1p = PolySample::exp(omega0*-1);
+    alpha_1p_hpf = (PolySample::exp(omega0*-1)*-1) + 1;
 }
 
 void PolyFilter::updateCoefs_AllTypes(PolyFilterState pfState){
     switch (pfState)
     {
-    case PolyFilterState::LOWPASS:
+    case PolyFilterState::LOWPASS_1P:
+        updateCoefs(PolySample(0), (alpha_1p*-1), PolySample(0), (alpha_1p) - 1, PolySample(0), PolySample(0)); 
+        break;
+    
+    case PolyFilterState::HIGHPASS_1P:
+        updateCoefs(PolySample(0), (alpha_1p_hpf*-1), PolySample(0), (alpha_1p_hpf*-1 + 1) / 2, (alpha_1p_hpf - 1) / 2, PolySample(0)); // BROKEN
+        break;
+    
+    case PolyFilterState::LOWPASS_2P:
         updateCoefsNormalized(alpha + 1, cos_omega0 * -2, (alpha*-1) + 1, (((cos_omega0*-1) + 1) / 2), (cos_omega0*-1) + 1, (((cos_omega0*-1) + 1) / 2)); 
         break;
     
-    case PolyFilterState::HIGHPASS:
+    case PolyFilterState::HIGHPASS_2P:
         updateCoefsNormalized(alpha + 1, cos_omega0 * -2, (alpha*-1) + 1, (cos_omega0 + 1) / 2, (cos_omega0 + 1) * -1, (cos_omega0 + 1) / 2); 
         break;
     
