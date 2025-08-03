@@ -17,18 +17,21 @@ float FoldUnit::multiFold(float sam){
     return stagesActive[3] ? singleFold(pipeline2, thresh3, gain3, shift3) : pipeline2;
 }
 
-PolySample FoldUnit::singleFold(PolySample sam, float thresh, float gain, float shift){
+PolySample FoldUnit::singleFold(PolySample sam, float thresh, float gain, float shift, int stageDelay){
     psThresh = thresh;
     ngThresh = thresh * -1;
 
     posFold = ((ngThresh - sam)*gain) + ngThresh + shift; //formulas from design doc
     negFold = psThresh - ((sam - psThresh)*gain) - shift;
     
-    return PolySample::ifelse(sam >= psThresh, posFold, PolySample::ifelse(sam <= ngThresh, negFold, sam));
+    gteMask = delayOn ? gteDelayMasks[stageDelay] : sam >= psThresh;
+    lteMask = delayOn ? lteDelayMasks[stageDelay] : sam <= ngThresh;
+
+    return PolySample::ifelse(gteMask, posFold, PolySample::ifelse(lteMask, negFold, sam));
 
 }
 
-void FoldUnit::updateFolds(float topThresh, float topGain, float topShift, float drop, bool* sA){
+void FoldUnit::updateFolds(float topThresh, float topGain, float topShift, float drop, bool* sA, bool delOn){
     thresh0 = topThresh;
     thresh1 = topThresh * 0.75 * drop;
     thresh2 = topThresh = 0.5 * drop;
@@ -47,12 +50,22 @@ void FoldUnit::updateFolds(float topThresh, float topGain, float topShift, float
     for(int i = 0; i < 4; i++){
         stagesActive[i] = *(sA + i);
     }
+
+    delayOn = delOn;
 }
 
-PolySample FoldUnit::multiFold(PolySample sam, float topThresh, float topGain, float topShift, float drop, bool* sA){
-    updateFolds(topThresh, topGain, topShift, drop, sA);
-    pipeline = stagesActive[0] ? singleFold(sam, thresh0, gain0, shift0) : sam;
-    pipeline = stagesActive[1] ? singleFold(pipeline, thresh1, gain1, shift1) : pipeline;
-    pipeline = stagesActive[2] ? singleFold(pipeline, thresh2, gain2, shift2) : pipeline;
-    return stagesActive[3] ? singleFold(pipeline, thresh3, gain3, shift3) : pipeline;
+PolySample FoldUnit::multiFold(PolySample sam, float topThresh, float topGain, float topShift, float drop, bool* sA, float del){
+    updateFolds(topThresh, topGain, topShift, drop, sA, del > 0.f);
+    gteDelayMasks.pushNewSample(sam >= topThresh);
+    lteDelayMasks.pushNewSample(sam <= topThresh * -1);
+
+    pipeline = stagesActive[0] ? singleFold(sam, thresh0, gain0, shift0, 0) : sam;
+    pipeline = stagesActive[1] ? singleFold(pipeline, thresh1, gain1, shift1, clampSafe(static_cast<int>(round(del * delayBufSize)), 0, delayBufSize)) : pipeline; //intense bounds checking
+    pipeline = stagesActive[2] ? singleFold(pipeline, thresh2, gain2, shift2, clampSafe(static_cast<int>(round(2 * del * delayBufSize)), 0, delayBufSize)) : pipeline;
+    return stagesActive[3] ? singleFold(pipeline, thresh3, gain3, shift3, clampSafe(static_cast<int>(round(3 * del * delayBufSize)), 0, delayBufSize)) : pipeline;
+}
+
+FoldUnit::FoldUnit(){
+    gteDelayMasks = PolySampleBuffer(delayBufSize);
+    lteDelayMasks = PolySampleBuffer(delayBufSize);
 }

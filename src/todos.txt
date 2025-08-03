@@ -15,14 +15,14 @@ ORGANIZED TODOS:
 . move submodule UI controls into submodule objects
 . connect all controls and datapaths
 . DATAPATH DONE! but then...
-. add PolyResampler/high quality derivatives
+. add PolyResampler/high quality derivatives - PARTIAL
 . manually add asin and acos PolySample definitions
 . optionally add log, exp, sqrt to ops
-. add dispersion and trigger delay settings to wavefolders
+. add dispersion and trigger delay settings to wavefolders - PARTIAL
 . add differentiator sensing to end of wavefolders and mix filtering in if derivs are too high... maybe
 . waveshape/replace???
 . add rectifier forward integration capability
-. add PolyFilterCascade and pole count adjustment
+. add PolyFilterCascade and pole count adjustment - PARTIAL
 . maybe add peak and shelving filters, marginal chance for phaser and comb filters
 . write new ScrollableDisplay knobs. this includes horizontal scrolling for pole adjustment
 . possibly collect all poly stuff into a PolyUtils file

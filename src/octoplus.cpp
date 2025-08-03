@@ -1,4 +1,5 @@
 
+#pragma once
 #include "plugin.hpp"
 #include "PolySample.hpp"
 #include "ScrollableDisplay.hpp"
@@ -19,12 +20,23 @@ struct Octoplus : Module {
         SIDE_PREBIAS_EXT_GAIN_PARAM,
 
         //prefold params
+        PREFOLD_MAIN_ON_PARAM,
+        PREFOLD_SIDE_ON_PARAM,
+        
         PREFOLD_GAIN_PARAM,
         PREFOLD_OFFSET_PARAM,
         PREFOLD_DISPERSE_PARAM,
         PREFOLD_THRESH_DROP_PARAM,
-        PREFOLD_CROSS_LENGTH_PARAM,
+        PREFOLD_DELAY_PARAM,
 
+        PREFOLD_FOLD_PASS_1_ON_PARAM,
+        PREFOLD_FOLD_PASS_2_ON_PARAM,
+        PREFOLD_FOLD_PASS_3_ON_PARAM,
+        PREFOLD_FOLD_PASS_4_ON_PARAM,
+
+        PREFOLD_MAIN_FILTER_ON_PARAM,
+        PREFOLD_SIDE_FILTER_ON_PARAM,
+        
         PREFOLD_FILTER_CUTOFF_PARAM,
         PREFOLD_FILTER_RESONANCE_PARAM,
 
@@ -79,7 +91,12 @@ struct Octoplus : Module {
         POSTFOLD_OFFSET_PARAM,
         POSTFOLD_DISPERSE_PARAM,
         POSTFOLD_THRESH_DROP_PARAM,
-        POSTFOLD_CROSS_LENGTH_PARAM,
+        POSTFOLD_DELAY_PARAM,
+
+        POSTFOLD_FOLD_PASS_1_ON_PARAM,
+        POSTFOLD_FOLD_PASS_2_ON_PARAM,
+        POSTFOLD_FOLD_PASS_3_ON_PARAM,
+        POSTFOLD_FOLD_PASS_4_ON_PARAM,
 
         POSTFOLD_FILTER_CUTOFF_PARAM,
         POSTFOLD_FILTER_RESONANCE_PARAM,
@@ -126,6 +143,9 @@ struct Octoplus : Module {
         PREFOLD_PLEAT_DISPERSE_INPUT,
         PREFOLD_PLEAT_THRESH_DROP_INPUT,
 
+        PREFOLD_FILTER_CUTOFF_INPUT,
+        PREFOLD_FILTER_RESONANCE_INPUT,
+
         //rect mod sigins
 
         RECT_QUANT_GAIN_INPUT,
@@ -137,6 +157,9 @@ struct Octoplus : Module {
         POSTFOLD_PLEAT_OFFSET_INPUT,
         POSTFOLD_PLEAT_DISPERSE_INPUT,
         POSTFOLD_PLEAT_THRESH_DROP_INPUT,
+
+        POSTFOLD_FILTER_CUTOFF_INPUT,
+        POSTFOLD_FILTER_RESONANCE_INPUT,
 
         INPUTS_LEN
 	};
@@ -168,11 +191,22 @@ struct Octoplus : Module {
         configParam(SIDE_PREBIAS_DC_AMP_PARAM, -10, 10, 0, "Side Prebias DC Amp");
         configParam(SIDE_PREBIAS_EXT_GAIN_PARAM, 0, 2, 1, "Side Prebias External Gain");
         
+        configParam(PREFOLD_MAIN_ON_PARAM, 0, 1, 0, "Prefold Main On");
+        configParam(PREFOLD_SIDE_ON_PARAM, 0, 1, 0, "Prefold Side On");
+        
         configParam(PREFOLD_GAIN_PARAM, 0, 1, 1, "Prefold Gain");
         configParam(PREFOLD_OFFSET_PARAM, 0, 10, 5, "Prefold Offset");
         configParam(PREFOLD_DISPERSE_PARAM, 0, 10, 5, "Prefold Disperse");
         configParam(PREFOLD_THRESH_DROP_PARAM, 0, 10, 5, "Prefold Thresh Drop");
-        configParam(PREFOLD_CROSS_LENGTH_PARAM, 0, 10, 5, "Prefold Cross Length");
+        configParam(PREFOLD_DELAY_PARAM, 0, 1, 0, "Prefold Stage Delay");
+
+        configParam(PREFOLD_FOLD_PASS_1_ON_PARAM, 0, 1, 0, "Pass 1");
+        configParam(PREFOLD_FOLD_PASS_2_ON_PARAM, 0, 1, 0, "Pass 3");
+        configParam(PREFOLD_FOLD_PASS_3_ON_PARAM, 0, 1, 0, "Pass 3");
+        configParam(PREFOLD_FOLD_PASS_4_ON_PARAM, 0, 1, 0, "Pass 4");
+
+        configParam(PREFOLD_MAIN_FILTER_ON_PARAM, 0, 1, 0, "Prefold Main Filter On");
+        configParam(PREFOLD_SIDE_FILTER_ON_PARAM, 0, 1, 0, "Prefold Side Filter On");
 
         configParam(PREFOLD_FILTER_CUTOFF_PARAM, 0, 4, 4, "Prefold Filter Cutoff");
         configParam(PREFOLD_FILTER_RESONANCE_PARAM, 0, 1, 0.707, "Prefold Filter Resonance");
@@ -219,7 +253,12 @@ struct Octoplus : Module {
         configParam(POSTFOLD_OFFSET_PARAM, 0, 10, 5, "Postfold Offset");
         configParam(POSTFOLD_DISPERSE_PARAM, 0, 10, 5, "Postfold Disperse");
         configParam(POSTFOLD_THRESH_DROP_PARAM, 0, 10, 5, "Postfold Thresh Drop");
-        configParam(POSTFOLD_CROSS_LENGTH_PARAM, 0, 10, 5, "Postfold Cross Length");
+        configParam(POSTFOLD_DELAY_PARAM, 0, 1, 0, "Postfold Stage Delay");
+
+        configParam(POSTFOLD_FOLD_PASS_1_ON_PARAM, 0, 1, 0, "Pass 1");
+        configParam(POSTFOLD_FOLD_PASS_2_ON_PARAM, 0, 1, 0, "Pass 3");
+        configParam(POSTFOLD_FOLD_PASS_3_ON_PARAM, 0, 1, 0, "Pass 3");
+        configParam(POSTFOLD_FOLD_PASS_4_ON_PARAM, 0, 1, 0, "Pass 4");
 
         configParam(POSTFOLD_FILTER_CUTOFF_PARAM, 0, 4, 4, "Postfold Filter Cutoff");
         configParam(POSTFOLD_FILTER_RESONANCE_PARAM, 0, 1, 0.707, "Postfold Filter Resonance");
@@ -260,6 +299,9 @@ struct Octoplus : Module {
         configInput(PREFOLD_PLEAT_DISPERSE_INPUT, "Prefold Disperse");
 		configInput(PREFOLD_PLEAT_THRESH_DROP_INPUT, "Prefold Thresh Drop");
 
+        configInput(PREFOLD_FILTER_CUTOFF_INPUT, "Cutoff Input");
+        configInput(PREFOLD_FILTER_RESONANCE_INPUT, "Reso Input");
+
 
         configInput(RECT_QUANT_GAIN_INPUT, "Rect Gain");
 		configInput(RECT_NUM_PASSES_INPUT, "Rect Passes");
@@ -269,6 +311,9 @@ struct Octoplus : Module {
 		configInput(POSTFOLD_PLEAT_OFFSET_INPUT, "Postfold Offset");
         configInput(POSTFOLD_PLEAT_DISPERSE_INPUT, "Postfold Disperse");
 		configInput(POSTFOLD_PLEAT_THRESH_DROP_INPUT, "Postfold Thresh Drop");
+
+        configInput(POSTFOLD_FILTER_CUTOFF_INPUT, "Cutoff Input");
+        configInput(POSTFOLD_FILTER_RESONANCE_INPUT, "Reso Input");
 		
 
         
@@ -351,6 +396,8 @@ struct Octoplus : Module {
     float drop;
 
     bool trues[4];
+    bool preTruths[4];
+    bool postTruths[4];
 
     PolyFilter prefoldFilter;
     PolyFilter postfoldFilter;
@@ -413,10 +460,14 @@ struct Octoplus : Module {
         gain = params[PREFOLD_GAIN_PARAM].getValue();
         shift = params[PREFOLD_OFFSET_PARAM].getValue();
         drop = params[PREFOLD_THRESH_DROP_PARAM].getValue();
+        preTruths[0] = params[PREFOLD_FOLD_PASS_1_ON_PARAM].getValue() == 1;
+        preTruths[1] = params[PREFOLD_FOLD_PASS_2_ON_PARAM].getValue() == 1;
+        preTruths[2] = params[PREFOLD_FOLD_PASS_3_ON_PARAM].getValue() == 1;
+        preTruths[3] = params[PREFOLD_FOLD_PASS_4_ON_PARAM].getValue() == 1;
 
-
-        leftFoldOutput = preFold.multiFold(leftMainPrefoldInput, thresh, gain, shift, drop, trues);
-        rightFoldOutput = preFold.multiFold(rightMainPrefoldInput, thresh, gain, shift, drop, trues);
+        float del = params[PREFOLD_DELAY_PARAM].getValue();
+        leftFoldOutput = preFold.multiFold(leftMainPrefoldInput, thresh, gain, shift, drop, preTruths, del);
+        rightFoldOutput = preFold.multiFold(rightMainPrefoldInput, thresh, gain, shift, drop, preTruths, del);
         //leftFoldOutput = leftMainPrefoldInput;
         //rightFoldOutput = rightMainPrefoldInput;
 
@@ -531,6 +582,8 @@ struct OctoplusWidget : ModuleWidget {
         //addChild(createWidget<FoldUnitOscilloscope>(mm2px(Vec(35, 70))));
         //addChild(createWidget<FoldUnitOscilloscope>(mm2px(Vec(135, 70))));
 
+        
+        
         auto* PrefoldOscilloscope = createWidget<FoldUnitOscilloscope>(mm2px(Vec(35, 70)));
         if(module){PrefoldOscilloscope->setFoldPointer(&(module->preFold));}
         addChild(PrefoldOscilloscope);
@@ -538,19 +591,27 @@ struct OctoplusWidget : ModuleWidget {
         if(module){PostfoldOscilloscope->setFoldPointer(&(module->postFold));}
         addChild(PostfoldOscilloscope);
 
+        
+
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10, 40)), module, Octoplus::MAIN_PREBIAS_DC_AMP_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(20, 40)), module, Octoplus::MAIN_PREBIAS_EXT_GAIN_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10, 80)), module, Octoplus::SIDE_PREBIAS_DC_AMP_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(20, 80)), module, Octoplus::SIDE_PREBIAS_EXT_GAIN_PARAM));
         
+        addParam(createParamCentered<CKSS>(mm2px(Vec(40, 55)), module, Octoplus::PREFOLD_MAIN_ON_PARAM));
+        addParam(createParamCentered<CKSS>(mm2px(Vec(50, 55)), module, Octoplus::PREFOLD_SIDE_ON_PARAM));
+        
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 10)), module, Octoplus::PREFOLD_GAIN_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 20)), module, Octoplus::PREFOLD_OFFSET_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 30)), module, Octoplus::PREFOLD_DISPERSE_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 40)), module, Octoplus::PREFOLD_THRESH_DROP_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 50)), module, Octoplus::PREFOLD_CROSS_LENGTH_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 50)), module, Octoplus::PREFOLD_DELAY_PARAM));
         
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 120)), module, Octoplus::PREFOLD_FILTER_CUTOFF_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(50, 120)), module, Octoplus::PREFOLD_FILTER_RESONANCE_PARAM));
+        addParam(createParamCentered<CKSS>(mm2px(Vec(40, 100)), module, Octoplus::PREFOLD_MAIN_FILTER_ON_PARAM));
+        addParam(createParamCentered<CKSS>(mm2px(Vec(50, 100)), module, Octoplus::PREFOLD_SIDE_FILTER_ON_PARAM));
+        
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40, 110)), module, Octoplus::PREFOLD_FILTER_CUTOFF_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(50, 110)), module, Octoplus::PREFOLD_FILTER_RESONANCE_PARAM));
 
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(80, 110)), module, Octoplus::RECT_GAIN_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(90, 110)), module, Octoplus::RECT_PASSES_PARAM));
@@ -714,10 +775,10 @@ struct OctoplusWidget : ModuleWidget {
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 20)), module, Octoplus::POSTFOLD_OFFSET_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 30)), module, Octoplus::POSTFOLD_DISPERSE_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 40)), module, Octoplus::POSTFOLD_THRESH_DROP_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 50)), module, Octoplus::POSTFOLD_CROSS_LENGTH_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 50)), module, Octoplus::POSTFOLD_DELAY_PARAM));
 
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 120)), module, Octoplus::POSTFOLD_FILTER_CUTOFF_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(150, 120)), module, Octoplus::POSTFOLD_FILTER_RESONANCE_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(140, 110)), module, Octoplus::POSTFOLD_FILTER_CUTOFF_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(150, 110)), module, Octoplus::POSTFOLD_FILTER_RESONANCE_PARAM));
 
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(175, 25)), module, Octoplus::MASTER_OUT_GAIN_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(185, 25)), module, Octoplus::MASTER_OUT_PAN_PARAM));
@@ -757,6 +818,9 @@ struct OctoplusWidget : ModuleWidget {
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 30)), module, Octoplus::PREFOLD_PLEAT_DISPERSE_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 40)), module, Octoplus::PREFOLD_PLEAT_THRESH_DROP_INPUT));
 
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(40, 120)), module, Octoplus::PREFOLD_FILTER_CUTOFF_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 120)), module, Octoplus::PREFOLD_FILTER_RESONANCE_INPUT));
+
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(80, 120)), module, Octoplus::RECT_QUANT_GAIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(90, 120)), module, Octoplus::RECT_NUM_PASSES_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(100, 120)), module, Octoplus::RECT_CONDITION_BLEND_INPUT));
@@ -765,6 +829,9 @@ struct OctoplusWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(150, 20)), module, Octoplus::POSTFOLD_PLEAT_OFFSET_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(150, 30)), module, Octoplus::POSTFOLD_PLEAT_DISPERSE_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(150, 40)), module, Octoplus::POSTFOLD_PLEAT_THRESH_DROP_INPUT));
+
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(140, 120)), module, Octoplus::POSTFOLD_FILTER_CUTOFF_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(150, 120)), module, Octoplus::POSTFOLD_FILTER_RESONANCE_INPUT));
 		
 
         addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(170, 15)), module, Octoplus::MASTER_LEFT_OR_MONO_OUTPUT));
@@ -783,7 +850,15 @@ struct OctoplusWidget : ModuleWidget {
         addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(180, 90)), module, Octoplus::FREE_CUSTOM_RIGHT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(190, 90)), module, Octoplus::FREE_CUSTOM_PULSE_OUTPUT));}
 
-        
+        addParam(createParam<CKSS>(mm2px(Vec(35, 60)), module, Octoplus::PREFOLD_FOLD_PASS_1_ON_PARAM));
+        addParam(createParam<CKSS>(mm2px(Vec(40, 60)), module, Octoplus::PREFOLD_FOLD_PASS_2_ON_PARAM));
+        addParam(createParam<CKSS>(mm2px(Vec(45, 60)), module, Octoplus::PREFOLD_FOLD_PASS_3_ON_PARAM));
+        addParam(createParam<CKSS>(mm2px(Vec(50, 60)), module, Octoplus::PREFOLD_FOLD_PASS_4_ON_PARAM));
+
+        addParam(createParam<CKSS>(mm2px(Vec(135, 60)), module, Octoplus::POSTFOLD_FOLD_PASS_1_ON_PARAM));
+        addParam(createParam<CKSS>(mm2px(Vec(140, 60)), module, Octoplus::POSTFOLD_FOLD_PASS_2_ON_PARAM));
+        addParam(createParam<CKSS>(mm2px(Vec(145, 60)), module, Octoplus::POSTFOLD_FOLD_PASS_3_ON_PARAM));
+        addParam(createParam<CKSS>(mm2px(Vec(150, 60)), module, Octoplus::POSTFOLD_FOLD_PASS_4_ON_PARAM));
 	}
 };
 

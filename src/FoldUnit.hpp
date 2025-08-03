@@ -1,7 +1,10 @@
 #pragma once
 #include "PolySample.hpp"
+#include "PolySampleBuffer.hpp"
 
 struct FoldUnit{
+    static constexpr int delayBufSize = 4800;
+    
     float thresh0;
     float thresh1;
     float thresh2;
@@ -19,6 +22,8 @@ struct FoldUnit{
 
     bool stagesActive[4];
 
+    bool delayOn;
+
     PolySample psThresh;
     PolySample ngThresh;
     PolySample posFold;
@@ -31,14 +36,24 @@ struct FoldUnit{
     float negFoldFloat;
     float psThreshFloat;
     float ngThreshFloat;
+
+    float delay;
+
+    PolySampleBuffer gteDelayMasks;
+    PolySampleBuffer lteDelayMasks;
+
+    PolySample gteMask;
+    PolySample lteMask;
     
     float singleFold(float sam, float thresh, float gain, float shift);
     
     float multiFold(float sam);
 
-    PolySample singleFold(PolySample sam, float thresh, float gain, float shift);
+    PolySample singleFold(PolySample sam, float thresh, float gain, float shift, int stageDelay);
 
-    void updateFolds(float topThresh, float topGain, float topShift, float drop, bool* sA);
+    void updateFolds(float topThresh, float topGain, float topShift, float drop, bool* sA, bool delOn);
 
-    PolySample multiFold(PolySample sam, float topThresh, float topGain, float topShift, float drop, bool* sA);
+    PolySample multiFold(PolySample sam, float topThresh, float topGain, float topShift, float drop, bool* sA, float delay);
+
+    FoldUnit();
 };

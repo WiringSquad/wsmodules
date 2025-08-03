@@ -1,3 +1,6 @@
+#ifndef POLYSAMPLEBUFFER_HPP
+#define POLYSAMPLEBUFFER_HPP
+
 #include "plugin.hpp"
 
 struct PolySampleBuffer{
@@ -16,3 +19,5 @@ struct PolySampleBuffer{
 
     const PolySample& operator[](size_t index) const;
 };
+
+#endif

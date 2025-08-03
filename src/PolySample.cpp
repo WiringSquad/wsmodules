@@ -206,6 +206,10 @@ PolySample PolySample::exp(PolySample arg){
     return result;
 }
 
+PolySample PolySample::sinc(float pos){
+    PolySample polyPos = PolySample(pos);
+    return PolySample::sin(polyPos) / polyPos;
+}
 
 //backwards finite difference
 PolySample PolySample::naive_bfd(PolySample lastSample, PolySample currentSample, float betwTime){

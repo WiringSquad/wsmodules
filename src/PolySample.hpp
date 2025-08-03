@@ -71,6 +71,8 @@ struct PolySample {
     static PolySample pow(PolySample arg, PolySample p);
 
     static PolySample exp(PolySample arg);
+
+    static PolySample sinc(float pos); //sinc for ideal resampling. float represents the time
     
     //backwards finite difference
     static PolySample naive_bfd(PolySample lastSample, PolySample currentSample, float betwTime);
