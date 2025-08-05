@@ -1,24 +1,27 @@
 {
-  "slug": "octoplus",
-  "name": "Octoplus",
+  "slug": "wsmodules",
+  "name": "WS_Modules",
   "version": "2.6.4",
-  "license": "proprietary",
+  "license": "MIT",
   "brand": "Wiring Squad",
   "author": "Rushil Narang",
-  "authorEmail": "",
+  "authorEmail": "wiringsquad@gmail.com",
   "authorUrl": "",
   "pluginUrl": "",
   "manualUrl": "",
-  "sourceUrl": "",
+  "sourceUrl": "https://github.com/WiringSquad/octoplus",
   "donateUrl": "",
   "changelogUrl": "",
   "modules": [
     {
       "slug": "octoplus",
       "name": "Octoplus",
-      "description": "rectifier",
+      "description": "derivative-sensitive rectifier and wavefolder",
       "tags": [
-        "effect"
+        "effect",
+        "distortion",
+        "rectifier",
+        "wavefolder"
       ]
     }
   ]
