@@ -489,14 +489,14 @@ struct Octoplus : Module {
         leftPrefoldFilterResult = prefoldFilter.process(leftFoldOutput);
         rightPrefoldFilterResult = prefoldFilter.process(rightFoldOutput);
 
-        dcBlockFreq = 15;
-        dcBlockRes = sqrt(2) / 2;
+        dcBlockFreq = 18; //dc blocker needs work
+        dcBlockRes = sqrt(2) / 2; //doesn't really do anything
         dcBlocker.updateParams(dcBlockFreq, dcBlockRes);
         dcBlocker.updateDownstreamParams();
-        dcBlocker.updateCoefs_AllTypes(PolyFilterState::HIGHPASS_2P);
+        dcBlocker.updateCoefs_AllTypes(PolyFilterState::HIGHPASS_1P);
         
-        dcBlocker.process(leftPrefoldFilterResult);
-        dcBlocker.process(rightPrefoldFilterResult);
+        //leftPrefoldFilterResult = dcBlocker.process(leftPrefoldFilterResult);
+        //rightPrefoldFilterResult = dcBlocker.process(rightPrefoldFilterResult);
 
         //refactor this trash
         leftPrefoldFilterResult.polySampleToOutput(outputs[MASTER_LEFT_OR_MONO_OUTPUT]);

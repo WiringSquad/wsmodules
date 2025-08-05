@@ -55,17 +55,22 @@ void PolyFilter::updateDownstreamParams(){
     //alpha_1p = omega0 / (omega0 + fs);
     alpha_1p = PolySample::exp(omega0*-1);
     alpha_1p_hpf = (PolySample::exp(omega0*-1)*-1) + 1;
+    big_A = PolySample::pow(PolySample(10), PolySample(gain) / 40); //from the cookbook
 }
 
 void PolyFilter::updateCoefs_AllTypes(PolyFilterState pfState){
     switch (pfState)
     {
+    case PolyFilterState::UNITY:
+        updateCoefs(PolySample(1), PolySample(0), PolySample(0), PolySample(1), PolySample(0), PolySample(0));
+        break;
+    
     case PolyFilterState::LOWPASS_1P:
         updateCoefs(PolySample(0), (alpha_1p*-1), PolySample(0), (alpha_1p) - 1, PolySample(0), PolySample(0)); 
         break;
     
     case PolyFilterState::HIGHPASS_1P:
-        updateCoefs(PolySample(0), (alpha_1p_hpf*-1), PolySample(0), (alpha_1p_hpf*-1 + 1) / 2, (alpha_1p_hpf - 1) / 2, PolySample(0)); // BROKEN
+        updateCoefs(PolySample(0), (alpha_1p*-1), PolySample(0), PolySample(1), PolySample(-1), PolySample(0)); // BROKEN
         break;
     
     case PolyFilterState::LOWPASS_2P:
@@ -86,6 +91,18 @@ void PolyFilter::updateCoefs_AllTypes(PolyFilterState pfState){
     
     case PolyFilterState::ALLPASS:
         updateCoefsNormalized(alpha + 1, cos_omega0 * -2, (alpha*-1) + 1, (alpha*-1) + 1, cos_omega0 * -2, alpha + 1);
+        break;
+
+    case PolyFilterState::PEAKING:
+        updateCoefsNormalized((alpha / big_A) + 1, cos_omega0*-2, ((alpha / big_A)*-1) + 1, (alpha * big_A) + 1, cos_omega0*-1, ((alpha * big_A)*-1) + 1);
+        break;
+    
+    case PolyFilterState::LOWSHELF:
+        updateCoefsNormalized(0, 0, 0, 0, 0, 0);
+        break;
+    
+    case PolyFilterState::HIGHSHELF:
+        updateCoefsNormalized(0, 0, 0, 0, 0, 0);
         break;
     
     default:

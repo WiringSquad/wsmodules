@@ -16,7 +16,8 @@ SOURCES := $(filter-out src/RectUnit.cpp, $(SOURCES))
 SOURCES := $(filter-out src/PolyFilterCascade.cpp, $(SOURCES)) 
 SOURCES := $(filter-out src/RectUnitWidget.cpp, $(SOURCES)) 
 SOURCES := $(filter-out src/FoldUnitWidget.cpp, $(SOURCES)) 
-
+SOURCES := $(filter-out src/ParallelPolyFilter.cpp, $(SOURCES)) 
+SOURCES := $(filter-out src/PolyFIRFilter.cpp, $(SOURCES)) 
 
 # Add files to the ZIP package when running `make dist`
 # The compiled plugin and "plugin.json" are automatically added.

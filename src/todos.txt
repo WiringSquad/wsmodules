@@ -34,12 +34,24 @@ ORGANIZED TODOS:
 . professionalize UI
 . release fully
 
+PRIMARY ROADMAP:
+. redesign wavefolder
+    . widen folder UI (and module by extension)
+    . add 2 separate gain controls
+    . maybe cut disperse setting
+    . 2 way filter setting
+    . filter location setting
+
+. write/rewrite custom controls
+    . add support for the horiz + vert scrolling that the filter setting requires
+. write rect controller
+. update filters
+. misc stuff
+    . add gain knob to main and side signals on input UI
+
 PROPOSAL: PolySignalUtility
 Utility for generating polyphonic control signals. 
 can generate ascending, descending, nonlinear polyphonic patterns.
 can be restricted to a certain number of channels.
-
-PROPOSAL: TransActor
-Utility to generate the transfer function/frequency and phase responses of a plugin. Plugin Doctor esque
 
 PROPOSAL: Release folder and filter as standalone modules

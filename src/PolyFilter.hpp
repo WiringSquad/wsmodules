@@ -4,6 +4,7 @@
 #include "PolySampleBuffer.hpp"
 
 enum class PolyFilterState{
+    UNITY,
     LOWPASS_1P,
     HIGHPASS_1P,
     LOWPASS_2P,
@@ -11,7 +12,10 @@ enum class PolyFilterState{
     HIGHPASS,
     BANDPASS,
     NOTCH,
-    ALLPASS
+    ALLPASS,
+    PEAKING,
+    LOWSHELF,
+    HIGHSHELF
 };
 
 struct PolyFilter{
@@ -32,28 +36,30 @@ struct PolyFilter{
     PolySample alpha;
     PolySample alpha_1p;
     PolySample alpha_1p_hpf;
+    PolySample big_A;
 
     PolySample Q;
     float fs;
     float res;
+    float gain;
 
 
     PolyFilter();
     
-    void updateCoefs(float A1, float A2, float B0, float B1, float B2);
+    virtual void updateCoefs(float A1, float A2, float B0, float B1, float B2);
 
-    void updateCoefs(PolySample A0, PolySample A1, PolySample A2, PolySample B0, PolySample B1, PolySample B2);
+    virtual void updateCoefs(PolySample A0, PolySample A1, PolySample A2, PolySample B0, PolySample B1, PolySample B2);
 
-    void updateCoefsNormalized(PolySample A0, PolySample A1, PolySample A2, PolySample B0, PolySample B1, PolySample B2);
+    virtual void updateCoefsNormalized(PolySample A0, PolySample A1, PolySample A2, PolySample B0, PolySample B1, PolySample B2);
 
-    void updateParams(float co, float reso);
+    virtual void updateParams(float co, float reso);
 
-    void updateParams(PolySample co, PolySample reso);
+    virtual void updateParams(PolySample co, PolySample reso);
 
-    void updateDownstreamParams();
+    virtual void updateDownstreamParams();
 
-    void updateCoefs_AllTypes(PolyFilterState pfState);
+    virtual void updateCoefs_AllTypes(PolyFilterState pfState);
 
-    PolySample process(PolySample currentX);
+    virtual PolySample process(PolySample currentX);
 
 };
