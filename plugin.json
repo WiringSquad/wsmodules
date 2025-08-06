@@ -23,6 +23,16 @@
         "rectifier",
         "wavefolder"
       ]
+    },
+    {
+      "slug": "polysignalutility",
+      "name": "PolySignalUtility",
+      "description": "generator",
+      "tags": [
+        "generator",
+        "utility",
+        "cv"
+      ]
     }
   ]
 }

@@ -11,6 +11,7 @@ std::vector<std::shared_ptr<Svg>> boolSvgCache;
 void init(Plugin* p) {
 	pluginInstance = p;
 	p->addModel(modelOctoplus);
+	p->addModel(modelPolySignalUtility);
 
 
 	// Add modules here
