@@ -1,7 +1,6 @@
-#ifndef POLYSAMPLEBUFFER_HPP
-#define POLYSAMPLEBUFFER_HPP
-
+#pragma once
 #include "plugin.hpp"
+#include "PolySample.hpp"
 
 struct PolySampleBuffer{
     int maxSize = 0;
@@ -17,7 +16,44 @@ struct PolySampleBuffer{
 
     PolySample naiveSecondOrderBFD(float betwTime);
 
+    PolySample& operator[](size_t index);
+
     const PolySample& operator[](size_t index) const;
+
+    /*PolySample& operator[](float index);
+
+    const PolySample& operator[](float index) const;*/
+
+    const PolySample resample(float index) const;
+
+    const PolySampleBuffer& operator=(const PolySampleBuffer& other);
 };
 
-#endif
+//stats tools, add sort, min and max
+
+void sort(PolySampleBuffer& buf);
+
+PolySampleBuffer sort(const PolySampleBuffer& buf);
+
+PolySample min(const PolySampleBuffer& buf);
+
+PolySample max(const PolySampleBuffer& buf);
+
+PolySample mean(const PolySampleBuffer& buf);
+
+PolySample median(const PolySampleBuffer& buf);
+
+PolySample variance(const PolySampleBuffer& buf);
+
+PolySample stddev(const PolySampleBuffer& buf);
+
+PolySample rms(const PolySampleBuffer& buf);
+
+PolySample skew(const PolySampleBuffer& buf);
+
+//add clear and fill utilities
+
+
+
+
+

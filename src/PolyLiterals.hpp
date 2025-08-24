@@ -1,3 +1,4 @@
+#pragma once
 #include "PolySample.hpp"
 
 enum class PolyLiterals{
@@ -28,7 +29,7 @@ enum class PolyLiterals{
     ITL_1_ON_4,
     ITL_2_ON_4,
     ITL_3_ON_4,
-    ITL_4_ON_4
+    ITL_4_ON_4,
     
     /*ITL_5_ON_1,
     ITL_5_ON_2,
@@ -36,10 +37,10 @@ enum class PolyLiterals{
     ITL_5_ON_4,
 
     ITL_*/
-
+    LITERS_LEN
 };
 
-PolySample getPolyLiteral(PolyLiterals lit){
+inline PolySample getPolyLiteral(PolyLiterals lit){
     switch(lit){
         case PolyLiterals::ZEROES:
             return PolySample(0.f);
@@ -57,6 +58,16 @@ PolySample getPolyLiteral(PolyLiterals lit){
             return PolySample(1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f);
         case PolyLiterals::ALTERN_BIP:
             return PolySample(1.f, -1.f, 1.f, -1.f, 1.f, -1.f, 1.f, -1.f, 1.f, -1.f, 1.f, -1.f, 1.f, -1.f, 1.f, -1.f);
+
+        case PolyLiterals::ITL_1_ON_1:
+            return PolySample(1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f, 0.f);
+        case PolyLiterals::ITL_2_ON_1:
+            return PolySample(1.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f);
+        case PolyLiterals::ITL_1_ON_2:
+            return PolySample(1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f);
+        case PolyLiterals::ITL_2_ON_2:
+            return PolySample(1.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f);
         default:
+            return PolySample(0.f); 
     }
 }

@@ -3,5 +3,6 @@
 #include "PolySampleBuffer.hpp"
 #include "PolyFilter.hpp"
 #include "PolyResampler.hpp"
+#include "PolyLiterals.hpp"
 
 

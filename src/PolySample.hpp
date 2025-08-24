@@ -1,6 +1,7 @@
 #pragma once
 #include "plugin.hpp"
 
+
 struct PolySample {
     simd::float_4 chans0_3;
     simd::float_4 chans4_7;
@@ -9,13 +10,18 @@ struct PolySample {
     //float temp[16];
 
     // 16 samples for polyphonic input
-    const float EPS = 0.0001f;
+    static constexpr float EPS = 0.0001f;
 
     //void setSample(Input inp); deprecated but still here
 
     PolySample();
 
     PolySample(float inp);
+
+    PolySample(float c0, float c1, float c2, float c3,
+               float c4, float c5, float c6, float c7,
+               float c8, float c9, float c10, float c11,
+               float c12, float c13, float c14, float c15);
 
     std::string toString();
     
@@ -36,24 +42,68 @@ struct PolySample {
     PolySample operator+(const float& value) const;
     
     PolySample operator+(const PolySample& other) const;
-    
+
+    friend PolySample operator+(const float& value, const PolySample& other);
+
+    PolySample operator +=(const float& value);
+
+    PolySample operator +=(const PolySample& other);
+
+    PolySample& operator++();
+
+    PolySample operator++(int);
+
+
+
     PolySample operator-(const float& value) const;
     
     PolySample operator-(const PolySample& other) const;
+
+    friend PolySample operator-(const float& value, const PolySample& other);
+
+    PolySample operator-=(const float& value);
+
+    PolySample operator-=(const PolySample& other);
+
+    PolySample& operator--();
+
+    PolySample operator--(int);
+
+    PolySample operator-();
+
+
     
     PolySample operator*(const float& value) const;
     
     PolySample operator*(const PolySample& other) const;
 
+    friend PolySample operator*(const float& value, const PolySample& other);
+
+    PolySample operator*=(const float& value);
+
+    PolySample operator*=(const PolySample& other);
+
+
+
     PolySample operator/(const float& value) const;
 
     PolySample operator/(const PolySample& other) const;
 
-    //>= and <= here
+    friend PolySample operator/(const float& value, const PolySample& other);
+
+    PolySample operator/=(const float& value);
+
+    PolySample operator/=(const PolySample& other);
+
+
 
     PolySample operator>=(const PolySample& other) const;
 
     PolySample operator<=(const PolySample& other) const;
+
+    float& operator[](size_t index);
+
+    const float& operator[](size_t index) const;
 
     //TODO: add simd math funcs
     //add conversions to and from float[16] just in case
@@ -64,9 +114,15 @@ struct PolySample {
 
     static PolySample tan(PolySample arg);
 
+    static PolySample asin(PolySample arg);
+
+    static PolySample acos(PolySample arg);
+
     static PolySample atan(PolySample arg);
 
     static PolySample pow(PolySample arg, float p);
+
+    static PolySample pow(float arg, PolySample p);
 
     static PolySample pow(PolySample arg, PolySample p);
 
@@ -85,6 +141,51 @@ struct PolySample {
     static PolySample crossfade(PolySample a, PolySample b, PolySample p);
 
     static PolySample crossfade(PolySample a, PolySample b, float p);
+
+    static void mac(PolySample& acc, float a, float b);
+
+    static void mac(PolySample& acc, PolySample a, float b);
+
+    static void mac(PolySample& acc, float a, PolySample b);
+    
+    static void mac(PolySample& acc, PolySample a, PolySample b);
+
+    PolySample operator&(const PolySample& other) const;
+
+    PolySample operator|(const PolySample& other) const;
+
+    PolySample operator~() const; 
+
+    PolySample operator^(const PolySample& other) const;
+
+    static PolySample unless(PolySample a, PolySample b);
+
+    static PolySample nand(PolySample a, PolySample b);
+
+    static PolySample nor(PolySample a, PolySample b);
+
+    static PolySample xnor(PolySample a, PolySample b);
+
+    static PolySample imply(PolySample a, PolySample b);
+
+    PolySample operator==(const PolySample& other) const;
+
+    PolySample operator!=(const PolySample& other) const;
+
+    PolySample operator>(const PolySample& other) const;
+
+    PolySample operator<(const PolySample& other) const;
+
+    static PolySample collapse(const PolySample& other, int* totalVoices);
+
+    static PolySample sqrt(float radicand);
+
+    static PolySample sqrt(PolySample radicand);
+
+    static PolySample abs(PolySample arg);
+
+    
+    
 
     
     

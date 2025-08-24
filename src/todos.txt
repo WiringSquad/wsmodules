@@ -1,3 +1,10 @@
+8/24 COMMIT CHANGES:
+. all functional polyphonic components are accessible from unified header PolyUtils.hpp. if you want to include PolyUtils in your project, use this!
+. fleshed out PolySample arithmetic operators, added mask logical ops, mac, sqrt, abs, etc
+. added stats tools to PolySampleBuffer: avg, rms, stddev, etc
+. added PolyVolume device to keep track of different volume metrics, will be used for pre-voice closed loop gain control and compression
+. PolySignalUtility now has limited functionality. It can output polyphonic CV and morph it with a knob, this is meant for controlling per-voice parameters
+
 quick todos:
 single pole/PolyFilterCascade (optional)
 filter nonlinearities (optional)
@@ -49,9 +56,33 @@ PRIMARY ROADMAP:
 . misc stuff
     . add gain knob to main and side signals on input UI
 
+
+POLYSAMPLE TODOS:
+. add easy MAC operations - DONE
+. add lhs float operations - DONE
+. add x= operations - DONE
+. implement digital logic operations - DONE
+. add isn and ics operations
+. add collapse/voice sorting operation - DONE
+. add toString and fromString properly
+. add increment and decrement operators - DONE
+. add comparison operations - DONE
+
+POLYFILTER TODOS:
+. adjust updatecoefs - DONE
+. package every update function into updatecoefs_alltypes - DONE
+. finish adding shelving filters
+. add nonlinearity setting - DONE
+
+WAVEFOLDER TODOS:
+. move filters to fold unit
+. try implementing disperse setting
+
+
 PROPOSAL: PolySignalUtility
 Utility for generating polyphonic control signals. 
 can generate ascending, descending, nonlinear polyphonic patterns.
 can be restricted to a certain number of channels.
 
 PROPOSAL: Release folder and filter as standalone modules
+

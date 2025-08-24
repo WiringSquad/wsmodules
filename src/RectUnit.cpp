@@ -126,51 +126,45 @@ struct RectUnit{
     }
 
     PolySample getComp(PolySample lhs, ScrollerData::CompsData comp, PolySample rhs){
-        /*switch(comp){
+        switch(comp){
             case ScrollerData::EQ:
-                return PolySample::ifelse(lhs == rhs, PolySample(1.0f), PolySample(0.0f));
+                return lhs == rhs;
             case ScrollerData::NEQ:
-                return PolySample::ifelse(lhs != rhs, PolySample(1.0f), PolySample(0.0f));
+                return lhs != rhs;
             case ScrollerData::GT:
-                return PolySample::ifelse(lhs > rhs, PolySample(1.0f), PolySample(0.0f));
+                return lhs > rhs;
             case ScrollerData::LT:
-                return PolySample::ifelse(lhs < rhs, PolySample(1.0f), PolySample(0.0f));
+                return lhs < rhs;
             case ScrollerData::GTE:
-                return PolySample::ifelse(lhs >= rhs, PolySample(1.0f), PolySample(0.0f));
+                return lhs >= rhs;
             case ScrollerData::LTE:
-                return PolySample::ifelse(lhs <= rhs, PolySample(1.0f), PolySample(0.0f));
-            default:
-                return PolySample(0.0f); // or throw an error
-        }*/
-
-        //WIP
-        return PolySample();
+                return lhs <= rhs;
+            default:    
+                return PolySample(0.0f); 
+        }
     }
 
     PolySample getBool(PolySample lhs, ScrollerData::BoolsData boolOp, PolySample rhs){
-        /*switch(boolOp){
+        switch(boolOp){
             case ScrollerData::AND:
-                return PolySample::ifelse(lhs > PolySample(0.0f) && rhs > PolySample(0.0f), PolySample(1.0f), PolySample(0.0f));
+                return lhs & rhs;
             case ScrollerData::OR:
-                return PolySample::ifelse(lhs > PolySample(0.0f) || rhs > PolySample(0.0f), PolySample(1.0f), PolySample(0.0f));
-            case ScrollerData::UNL: //unary not
-                return PolySample::ifelse(lhs <= PolySample(0.0f), PolySample(1.0f), PolySample(0.0f));
-            case ScrollerData::NND: //nand
-                return PolySample::ifelse(!(lhs > PolySample(0.0f) && rhs > PolySample(0.0f)), PolySample(1.0f), PolySample(0.0f));
-            case ScrollerData::NOR: //nor
-                return PolySample::ifelse(!(lhs > PolySample(0.0f) || rhs > PolySample(0.0f)), PolySample(1.0f), PolySample(0.0f));
-            case ScrollerData::XOR: //exclusive or
-                return PolySample::ifelse((lhs > PolySample(0.0f)) != (rhs > PolySample(0.0f)), PolySample(1.0f), PolySample(0.0f));
-            case ScrollerData::XNR: //exclusive nor
-                return PolySample::ifelse((lhs > PolySample(0.0f)) == (rhs > PolySample(0.0f)), PolySample(1.0f), PolySample(0.0f));
-            case ScrollerData::IMP: //implication
-                return getComp(lhs, ScrollerData::GTE, rhs);
+                return lhs | rhs;
+            case ScrollerData::UNL: 
+                return PolySample::unless(lhs, rhs);
+            case ScrollerData::NND:
+                return PolySample::nand(lhs, rhs);
+            case ScrollerData::NOR:
+                return PolySample::nor(lhs, rhs);
+            case ScrollerData::XOR:
+                return lhs ^ rhs;
+            case ScrollerData::XNR:
+                return PolySample::xnor(lhs, rhs);
+            case ScrollerData::IMP:
+                return PolySample::imply(lhs, rhs); 
             default:
-                return PolySample(0.0f); // or throw an error
-        }*/
-
-        //WIP
-        return PolySample();
+                return PolySample(0.0f);
+        }
     }
     
     PolySample singleRect(PolySample sam, PolySample gain, PolySample mask){
