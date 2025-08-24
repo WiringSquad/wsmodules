@@ -18,7 +18,17 @@ enum class PolyFilterState{
     HIGHSHELF
 };
 
+enum class PolyFilterNonlinearityState{
+    LINEAR,
+    SC_ITN, //inverse tangent soft clip
+    SC_SGM, //sigmoid soft clip
+    IO_RM // internal oscillator ring modulation
+};
+
 struct PolyFilter{
+    PolyFilterState state;
+    PolyFilterNonlinearityState nlState;
+    
     PolySample a0;
     PolySample a1;
     PolySample a2;
@@ -45,6 +55,18 @@ struct PolyFilter{
 
 
     PolyFilter();
+
+    PolyFilter(PolyFilterState pfState, int sampleRate);
+
+    PolyFilter(PolyFilterState pfState, PolySample co, PolySample reso, int sampleRate);
+
+    virtual void setState(PolyFilterState filterState);
+
+    virtual void setNonlinearityState(PolyFilterNonlinearityState distState);
+
+    virtual void setAllStates(PolyFilterState filterState, PolyFilterNonlinearityState distState);
+    
+    virtual void setSampleRate(int sampleRate);
     
     virtual void updateCoefs(float A1, float A2, float B0, float B1, float B2);
 
@@ -58,8 +80,10 @@ struct PolyFilter{
 
     virtual void updateDownstreamParams();
 
-    virtual void updateCoefs_AllTypes(PolyFilterState pfState);
+    virtual void updateCoefs_AllTypes(PolySample co, PolySample reso);
 
     virtual PolySample process(PolySample currentX);
 
+    virtual PolySample processNonlinearity(PolySample fbToProcess);
 };
+

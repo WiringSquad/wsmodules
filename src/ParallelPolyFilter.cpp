@@ -1,4 +1,3 @@
-#pragma once
 #include "PolySample.hpp"
 #include "PolyFilter.hpp"
 

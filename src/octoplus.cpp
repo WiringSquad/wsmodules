@@ -1,13 +1,12 @@
-
-#pragma once
 #include "plugin.hpp"
-#include "PolySample.hpp"
+//#include "PolySample.hpp"
 #include "ScrollableDisplay.hpp"
 #include "FoldUnit.hpp"
 #include "FoldUnitOscilloscope.hpp"
 #include "ThreeStateCheckbox.hpp"
-#include "PolyFilter.hpp"
+//#include "PolyFilter.hpp"
 #include "SwapButton.hpp"
+#include "PolyUtils.hpp"
 
 
 
@@ -334,6 +333,8 @@ struct Octoplus : Module {
         trues[1] = true;
         trues[2] = true;
         trues[3] = true;
+
+        dcBlocker = PolyFilter(PolyFilterState::HIGHPASS_1P, PolySample(18), PolySample(0), APP->engine->getSampleRate());
 	}
     //Main signal values
     /*double leftOrMonoMainPosCurrent;
@@ -479,26 +480,31 @@ struct Octoplus : Module {
 
         float rawCutoff = params[PREFOLD_FILTER_CUTOFF_PARAM].getValue(); // repl
         float rawResonance = params[PREFOLD_FILTER_RESONANCE_PARAM].getValue();
-        
-        //refactor this, it's garbage. cutoff is exponentially mapped here, but resonance is mapped in the method, what a pain
-        prefoldFilter.updateParams(2 * pow(10, rawCutoff), rawResonance);
-        prefoldFilter.updateDownstreamParams();
 
-        prefoldFilter.updateCoefs_AllTypes(PolyFilterState::LOWPASS_2P);
+        prefoldFilter.setAllStates(PolyFilterState::LOWPASS_2P, PolyFilterNonlinearityState::LINEAR);
+        prefoldFilter.updateCoefs_AllTypes(rawCutoff, rawResonance);
 
         leftPrefoldFilterResult = prefoldFilter.process(leftFoldOutput);
         rightPrefoldFilterResult = prefoldFilter.process(rightFoldOutput);
 
         dcBlockFreq = 18; //dc blocker needs work
-        dcBlockRes = sqrt(2) / 2; //doesn't really do anything
-        dcBlocker.updateParams(dcBlockFreq, dcBlockRes);
-        dcBlocker.updateDownstreamParams();
-        dcBlocker.updateCoefs_AllTypes(PolyFilterState::HIGHPASS_1P);
+        dcBlockRes = sqrt(2) / 2; //doesn't really do anything because the filter is 1 pole
+        dcBlocker.updateCoefs_AllTypes(dcBlockFreq, dcBlockRes);
         
         //leftPrefoldFilterResult = dcBlocker.process(leftPrefoldFilterResult);
         //rightPrefoldFilterResult = dcBlocker.process(rightPrefoldFilterResult);
 
         //refactor this trash
+
+        /*int leftChans = 0;
+        int rightChans = 0;
+        PolySample lPFR = PolySample::collapse(leftPrefoldFilterResult, &leftChans);
+        PolySample rPFR = PolySample::collapse(rightPrefoldFilterResult, &rightChans);*/
+
+        //absolutely not final, I just want to push all this garbage
+        /*outputs[MASTER_LEFT_OR_MONO_OUTPUT].setChannels(leftChans);
+        outputs[MASTER_RIGHT_OUTPUT].setChannels(rightChans);*/
+        
         leftPrefoldFilterResult.polySampleToOutput(outputs[MASTER_LEFT_OR_MONO_OUTPUT]);
         rightPrefoldFilterResult.polySampleToOutput(outputs[MASTER_RIGHT_OUTPUT]);
 

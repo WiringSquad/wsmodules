@@ -1,10 +1,40 @@
 #include "PolyFilter.hpp"
 
-
 PolyFilter::PolyFilter(){
     xt = PolySampleBuffer(2);
     yt = PolySampleBuffer(2);
     fs = 48000;
+}
+
+PolyFilter::PolyFilter(PolyFilterState pfState, int sampleRate) : fs(sampleRate){
+    xt = PolySampleBuffer(2);
+    yt = PolySampleBuffer(2);
+
+}
+
+PolyFilter::PolyFilter(PolyFilterState state, PolySample co, PolySample reso, int sampleRate) : state(state), fs(sampleRate){
+    xt = PolySampleBuffer(2);
+    yt = PolySampleBuffer(2);
+    updateParams(co, reso);
+    updateDownstreamParams();
+
+}
+
+void PolyFilter::setNonlinearityState(PolyFilterNonlinearityState distState){
+    nlState = distState;
+}
+
+void PolyFilter::setState(PolyFilterState state){
+    state = state;
+}
+
+void PolyFilter::setAllStates(PolyFilterState filterState, PolyFilterNonlinearityState distState){
+    state = filterState;
+    nlState = distState;
+}
+
+void PolyFilter::setSampleRate(int sampleRate){
+    fs = sampleRate;
 }
 
 void PolyFilter::updateCoefs(float A1, float A2, float B0, float B1, float B2){
@@ -35,12 +65,12 @@ void PolyFilter::updateParams(float co, float reso){
     omega0 = 2*M_PI*(co / fs);
     float qmin = 0.5;
     float qmax = 20;
-    PolySample temp = (qmax / qmin);
     Q = reso*(qmax - qmin) + qmin;
     //add in q here later
 }
 
 void PolyFilter::updateParams(PolySample co, PolySample reso){
+    co = 2 * PolySample::pow(10, co);
     omega0 = (co / fs)*2*M_PI;
     float qmin = 0.5;
     float qmax = 20;
@@ -53,44 +83,46 @@ void PolyFilter::updateDownstreamParams(){
     sin_omega0 = PolySample::sin(omega0);
     alpha = sin_omega0 / (Q * 2);
     //alpha_1p = omega0 / (omega0 + fs);
-    alpha_1p = PolySample::exp(omega0*-1);
-    alpha_1p_hpf = (PolySample::exp(omega0*-1)*-1) + 1;
-    big_A = PolySample::pow(PolySample(10), PolySample(gain) / 40); //from the cookbook
+    alpha_1p = PolySample::exp(-omega0);
+    alpha_1p_hpf = 1 - PolySample::exp(-omega0);
+    big_A = PolySample::pow(10, PolySample(gain) / 40); //from the cookbook
 }
 
-void PolyFilter::updateCoefs_AllTypes(PolyFilterState pfState){
-    switch (pfState)
+void PolyFilter::updateCoefs_AllTypes(PolySample co, PolySample reso){    
+    updateParams(co, reso);
+    updateDownstreamParams();
+    switch(state)
     {
     case PolyFilterState::UNITY:
-        updateCoefs(PolySample(1), PolySample(0), PolySample(0), PolySample(1), PolySample(0), PolySample(0));
+        updateCoefs(1, 0, 0, 1, 0, 0);
         break;
     
     case PolyFilterState::LOWPASS_1P:
-        updateCoefs(PolySample(0), (alpha_1p*-1), PolySample(0), (alpha_1p) - 1, PolySample(0), PolySample(0)); 
+        updateCoefs(0, (-alpha_1p), 0, (alpha_1p) - 1, 0, 0); 
         break;
     
     case PolyFilterState::HIGHPASS_1P:
-        updateCoefs(PolySample(0), (alpha_1p*-1), PolySample(0), PolySample(1), PolySample(-1), PolySample(0)); // BROKEN
+        updateCoefs(0, (-alpha_1p), 0, 1, -1, 0); 
         break;
     
     case PolyFilterState::LOWPASS_2P:
-        updateCoefsNormalized(alpha + 1, cos_omega0 * -2, (alpha*-1) + 1, (((cos_omega0*-1) + 1) / 2), (cos_omega0*-1) + 1, (((cos_omega0*-1) + 1) / 2)); 
+        updateCoefsNormalized(alpha + 1, -2 * cos_omega0, 1 - alpha, ((1 - cos_omega0) / 2), (1 - cos_omega0), ((1 - cos_omega0) / 2)); 
         break;
     
     case PolyFilterState::HIGHPASS_2P:
-        updateCoefsNormalized(alpha + 1, cos_omega0 * -2, (alpha*-1) + 1, (cos_omega0 + 1) / 2, (cos_omega0 + 1) * -1, (cos_omega0 + 1) / 2); 
+        updateCoefsNormalized(alpha + 1, cos_omega0 * -2, 1 - alpha, (cos_omega0 + 1) / 2, -1 - cos_omega0, (cos_omega0 + 1) / 2); 
         break;
     
     case PolyFilterState::BANDPASS:
-        updateCoefsNormalized(alpha + 1, cos_omega0 * -2, (alpha*-1) + 1, Q * alpha, 0, Q * alpha * -1); 
+        updateCoefsNormalized(alpha + 1, cos_omega0 * -2, 1 - alpha, Q * alpha, 0, Q * -alpha); 
         break;
     
     case PolyFilterState::NOTCH:
-        updateCoefsNormalized(alpha + 1, cos_omega0 * -2, (alpha*-1) + 1, 1, cos_omega0 * -2, 1);
+        updateCoefsNormalized(alpha + 1, cos_omega0 * -2, 1 - alpha, 1, cos_omega0 * -2, 1);
         break;
     
     case PolyFilterState::ALLPASS:
-        updateCoefsNormalized(alpha + 1, cos_omega0 * -2, (alpha*-1) + 1, (alpha*-1) + 1, cos_omega0 * -2, alpha + 1);
+        updateCoefsNormalized(alpha + 1, cos_omega0 * -2, 1 - alpha, 1 - alpha, cos_omega0 * -2, alpha + 1);
         break;
 
     case PolyFilterState::PEAKING:
@@ -114,7 +146,20 @@ PolySample PolyFilter::process(PolySample currentX){
     PolySample newY;
     newY = (b0 * currentX) + (b1 * xt[1]) + (b2 * xt[0]) - (a1 * yt[1]) - (a2 * yt[0]);
     xt.pushNewSample(currentX);
-    yt.pushNewSample(newY);
+    yt.pushNewSample(processNonlinearity(newY));
     return newY;
+}
+
+PolySample PolyFilter::processNonlinearity(PolySample fbToProcess){
+    switch(nlState){
+        case PolyFilterNonlinearityState::SC_ITN:
+            return PolySample::atan(fbToProcess);
+        case PolyFilterNonlinearityState::SC_SGM:
+            return PolySample(); //implement this
+        case PolyFilterNonlinearityState::IO_RM:
+            return PolySample(); //implement this
+        default:
+            return fbToProcess;
+    }
 }
 
