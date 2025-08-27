@@ -20,13 +20,19 @@ struct PolySampleBuffer{
 
     const PolySample& operator[](size_t index) const;
 
-    /*PolySample& operator[](float index);
-
-    const PolySample& operator[](float index) const;*/
-
     const PolySample resample(float index) const;
 
     const PolySampleBuffer& operator=(const PolySampleBuffer& other);
+
+    void fill(PolySample p);
+    
+    void clear();
+
+    bool contains(float f);
+    
+    bool contains(PolySample p);
+
+    bool containsNans();
 };
 
 //stats tools, add sort, min and max

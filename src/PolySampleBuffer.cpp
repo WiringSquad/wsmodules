@@ -57,6 +57,44 @@ const PolySampleBuffer& PolySampleBuffer::operator=(const PolySampleBuffer& othe
     return *this;
 }
 
+void PolySampleBuffer::fill(PolySample p){
+    for(int i = 0; i < maxSize; i++){
+        pushNewSample(p);
+    }
+}
+
+void PolySampleBuffer::clear(){
+    fill(0);
+}
+
+bool PolySampleBuffer::contains(float f){
+    for(int i = 0; i < maxSize; i++){
+        if(polyBuffer[i].contains(f)){ 
+            return true;
+        }
+    }
+    return false;
+}
+
+bool PolySampleBuffer::contains(PolySample p){
+    for(int i = 0; i < maxSize; i++){
+        if(PolySample::movemask(polyBuffer[i] == p) == 0xffff){ 
+            return true;
+        }
+    }
+    return false;
+}
+
+bool PolySampleBuffer::containsNans(){
+    for(int i = 0; i < maxSize; i++){
+        if(polyBuffer[i].containsNans()){
+            return true;
+        }
+    }
+    return false;
+}
+
+
 
 
 //stats tools

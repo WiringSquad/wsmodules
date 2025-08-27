@@ -53,6 +53,7 @@ struct PolySignalUtility : Module{
     PolySignalUtility(){
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         int len = static_cast<int>(PolyLiterals::LITERS_LEN);
+        int opslen = static_cast<int>(PolyOperations::OPERS_LEN);
         configParam(MORPH_PARAM, -10, 10, 0, "Morph");
         configParam(LITER_ONE_TYPE_PARAM, 0, len, 0, "Literal One Type");
         configParam(LITER_TWO_TYPE_PARAM, 0, len, 0, "Literal Two Type");
@@ -60,6 +61,9 @@ struct PolySignalUtility : Module{
         configParam(LITER_FOUR_TYPE_PARAM, 0, len, 0, "Literal Four Type");
         configParam(LITER_FIVE_TYPE_PARAM, 0, len, 0, "Literal Five Type");
         configParam(LITER_SIX_TYPE_PARAM, 0, len, 0, "Literal Six Type");
+        
+        configParam(OP_ONE_TYPE_PARAM, 0, opslen, 0, "Op One Type");
+        configParam(OP_TWO_TYPE_PARAM, 0, opslen, 0, "Op One Type");
 
         configInput(LITER_ONE_INPUT, "Literal One");
         configInput(LITER_TWO_INPUT, "Literal Two");
@@ -97,16 +101,35 @@ struct PolySignalUtility : Module{
     PolySample processedLiterFour;
     PolySample processedLiterFive;
     PolySample processedLiterSix;
+
+    PolySample lhsOne;
+    PolySample rhsOne;
+    PolySample itlOne;
+    
+    PolySample lhsTwo;
+    PolySample rhsTwo;
+    PolySample itlTwo;
+
+    PolySample postOpOne;
+    PolySample postOpTwo;
+
     void process(const ProcessArgs& args) override{
         morph = params[MORPH_PARAM].getValue();
-        morph.polySampleToOutput(outputs[MORPH_OUTPUT]);
+        PolySample::polySampleToOutput(morph, outputs[MORPH_OUTPUT]);
 
-        processedLiterOne.polySampleFromInput(inputs[LITER_ONE_INPUT]);
-        processedLiterTwo.polySampleFromInput(inputs[LITER_TWO_INPUT]);
-        processedLiterThree.polySampleFromInput(inputs[LITER_THREE_INPUT]);
-        processedLiterFour.polySampleFromInput(inputs[LITER_FOUR_INPUT]);
-        processedLiterFive.polySampleFromInput(inputs[LITER_FIVE_INPUT]);
-        processedLiterSix.polySampleFromInput(inputs[LITER_SIX_INPUT]);
+        PolySample::polySampleFromInput(processedLiterOne, inputs[LITER_ONE_INPUT]);
+        PolySample::polySampleFromInput(processedLiterTwo, inputs[LITER_TWO_INPUT]);
+        PolySample::polySampleFromInput(processedLiterThree, inputs[LITER_THREE_INPUT]);
+        PolySample::polySampleFromInput(processedLiterFour, inputs[LITER_FOUR_INPUT]);
+        PolySample::polySampleFromInput(processedLiterFive, inputs[LITER_FIVE_INPUT]);
+        PolySample::polySampleFromInput(processedLiterSix, inputs[LITER_SIX_INPUT]);
+
+        PolySample::polySampleFromInput(lhsOne, inputs[OP_ONE_LHS_INPUT]);
+        PolySample::polySampleFromInput(rhsOne, inputs[OP_ONE_RHS_INPUT]);
+        PolySample::polySampleFromInput(itlOne, inputs[OP_ONE_INTERLEAVE_INPUT]);
+        PolySample::polySampleFromInput(lhsTwo, inputs[OP_TWO_LHS_INPUT]);
+        PolySample::polySampleFromInput(rhsTwo, inputs[OP_TWO_RHS_INPUT]);
+        PolySample::polySampleFromInput(itlTwo, inputs[OP_TWO_INTERLEAVE_INPUT]);
 
         processedLiterOne *= getPolyLiteral(static_cast<PolyLiterals>(params[LITER_ONE_TYPE_PARAM].getValue()));
         processedLiterTwo *= getPolyLiteral(static_cast<PolyLiterals>(params[LITER_TWO_TYPE_PARAM].getValue()));
@@ -115,12 +138,19 @@ struct PolySignalUtility : Module{
         processedLiterFive *= getPolyLiteral(static_cast<PolyLiterals>(params[LITER_FIVE_TYPE_PARAM].getValue()));
         processedLiterSix *= getPolyLiteral(static_cast<PolyLiterals>(params[LITER_SIX_TYPE_PARAM].getValue()));
 
-        processedLiterOne.polySampleToOutput(outputs[LITER_ONE_OUTPUT]);
-        processedLiterTwo.polySampleToOutput(outputs[LITER_TWO_OUTPUT]);
-        processedLiterThree.polySampleToOutput(outputs[LITER_THREE_OUTPUT]);
-        processedLiterFour.polySampleToOutput(outputs[LITER_FOUR_OUTPUT]);
-        processedLiterFive.polySampleToOutput(outputs[LITER_FIVE_OUTPUT]);
-        processedLiterSix.polySampleToOutput(outputs[LITER_SIX_OUTPUT]);
+        postOpOne = getPolyOperation(lhsOne, rhsOne, itlOne, static_cast<PolyOperations>(params[OP_ONE_TYPE_PARAM].getValue()));
+        postOpTwo = getPolyOperation(lhsTwo, rhsTwo, itlTwo, static_cast<PolyOperations>(params[OP_TWO_TYPE_PARAM].getValue()));
+        
+        PolySample::polySampleToOutput(processedLiterOne, outputs[LITER_ONE_OUTPUT]);
+        PolySample::polySampleToOutput(processedLiterTwo, outputs[LITER_TWO_OUTPUT]);
+        PolySample::polySampleToOutput(processedLiterThree, outputs[LITER_THREE_OUTPUT]);
+        PolySample::polySampleToOutput(processedLiterFour, outputs[LITER_FOUR_OUTPUT]);
+        PolySample::polySampleToOutput(processedLiterFive, outputs[LITER_FIVE_OUTPUT]);
+        PolySample::polySampleToOutput(processedLiterSix, outputs[LITER_SIX_OUTPUT]);
+
+        PolySample::polySampleToOutput(postOpOne, outputs[OP_ONE_OUTPUT]);
+        PolySample::polySampleToOutput(postOpTwo, outputs[OP_TWO_OUTPUT]);
+
 
 
     }

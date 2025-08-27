@@ -91,6 +91,14 @@ void PolyFilter::updateDownstreamParams(){
 void PolyFilter::updateCoefs_AllTypes(PolySample co, PolySample reso){    
     updateParams(co, reso);
     updateDownstreamParams();
+    
+    if(xt.containsNans()){
+        xt.clear();
+    }
+    if(yt.containsNans()){
+        yt.clear();
+    }
+
     switch(state)
     {
     case PolyFilterState::UNITY:

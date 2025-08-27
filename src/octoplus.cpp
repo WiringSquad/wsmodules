@@ -416,36 +416,36 @@ struct Octoplus : Module {
         //TODO: rework with vectors
         
         //capture poly inputs from the main and side + prebs. handles left/mono logic
-        leftOrMonoMain.polySampleFromInput(inputs[MAIN_LEFT_OR_MONO_INPUT]);
+        PolySample::polySampleFromInput(leftOrMonoMain, inputs[MAIN_LEFT_OR_MONO_INPUT]);
         if(!inputs[MAIN_RIGHT_INPUT].isConnected() && inputs[MAIN_LEFT_OR_MONO_INPUT].isConnected()){
             rightMain = leftOrMonoMain;
         }
         else{
-            rightMain.polySampleFromInput(inputs[MAIN_RIGHT_INPUT]);
+            PolySample::polySampleFromInput(rightMain, inputs[MAIN_RIGHT_INPUT]);
         }
 
-        leftOrMonoMainPrebias.polySampleFromInput(inputs[MAIN_PREBIAS_LEFT_OR_MONO_INPUT]);
+        PolySample::polySampleFromInput(leftOrMonoMainPrebias, inputs[MAIN_PREBIAS_LEFT_OR_MONO_INPUT]);
          if(!inputs[MAIN_PREBIAS_RIGHT_INPUT].isConnected() && inputs[MAIN_PREBIAS_LEFT_OR_MONO_INPUT].isConnected()){
             rightMainPrebias = leftOrMonoMainPrebias;
         }
         else{
-            rightMainPrebias.polySampleFromInput(inputs[MAIN_PREBIAS_RIGHT_INPUT]);
+            PolySample::polySampleFromInput(rightMainPrebias, inputs[MAIN_PREBIAS_RIGHT_INPUT]);
         }
 
-        leftOrMonoSide.polySampleFromInput(inputs[MAIN_LEFT_OR_MONO_INPUT]);
+        PolySample::polySampleFromInput(leftOrMonoSide, inputs[MAIN_LEFT_OR_MONO_INPUT]);
         if(!inputs[MAIN_RIGHT_INPUT].isConnected() && inputs[MAIN_LEFT_OR_MONO_INPUT].isConnected()){
             rightSide = leftOrMonoSide;
         }
         else{
-            rightSide.polySampleFromInput(inputs[MAIN_RIGHT_INPUT]);
+            PolySample::polySampleFromInput(rightSide, inputs[MAIN_RIGHT_INPUT]);
         }
 
-        leftOrMonoSidePrebias.polySampleFromInput(inputs[SIDE_PREBIAS_LEFT_OR_MONO_INPUT]);
+        PolySample::polySampleFromInput(leftOrMonoSidePrebias, inputs[SIDE_PREBIAS_LEFT_OR_MONO_INPUT]);
          if(!inputs[SIDE_PREBIAS_RIGHT_INPUT].isConnected() && inputs[SIDE_PREBIAS_LEFT_OR_MONO_INPUT].isConnected()){
             rightSidePrebias = leftOrMonoSidePrebias;
         }
         else{
-            rightSidePrebias.polySampleFromInput(inputs[SIDE_PREBIAS_RIGHT_INPUT]);
+            PolySample::polySampleFromInput(rightSidePrebias, inputs[SIDE_PREBIAS_RIGHT_INPUT]);
         }
         
 
@@ -505,10 +505,10 @@ struct Octoplus : Module {
         /*outputs[MASTER_LEFT_OR_MONO_OUTPUT].setChannels(leftChans);
         outputs[MASTER_RIGHT_OUTPUT].setChannels(rightChans);*/
         
-        leftPrefoldFilterResult.polySampleToOutput(outputs[MASTER_LEFT_OR_MONO_OUTPUT]);
-        rightPrefoldFilterResult.polySampleToOutput(outputs[MASTER_RIGHT_OUTPUT]);
+        PolySample::polySampleToOutput(leftPrefoldFilterResult, outputs[MASTER_LEFT_OR_MONO_OUTPUT]);
+        PolySample::polySampleToOutput(rightPrefoldFilterResult, outputs[MASTER_RIGHT_OUTPUT]);
 
-        //DEBUG(leftMainPrefoldInput.toString().c_str());
+        //DEBUG(leftPrefoldFilterResult.toString().c_str());
 
 
 

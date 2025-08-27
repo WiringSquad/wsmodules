@@ -25,9 +25,9 @@ struct PolySample {
 
     std::string toString();
     
-    void polySampleFromInput(Input& inp);
+    static void polySampleFromInput(PolySample& p, Input& inp);
 
-    void polySampleToOutput(Output& otp);
+    static void polySampleToOutput(const PolySample& p, Output& otp);
     
     PolySample& operator=(const float& value);
     
@@ -184,9 +184,52 @@ struct PolySample {
 
     static PolySample abs(PolySample arg);
 
+    static PolySample log(PolySample arg);
+
+    static PolySample log_arb(PolySample arg, PolySample base);
+
+    static PolySample log2(PolySample arg);
+
+    static PolySample log10(PolySample arg);
+
+    static PolySample linear_to_db(PolySample lin);
+
+    static PolySample db_to_linear(PolySample db);
+
+    static PolySample db_scale(PolySample arg, PolySample scale);
+
+    static void pan_triangular(PolySample left,  PolySample right, PolySample& leftOut, PolySample& rightOut, PolySample pan); 
+
+    static void pan_circular(PolySample left,  PolySample right, PolySample& leftOut, PolySample& rightOut, PolySample pan);
+
+    static void lr_to_ms(PolySample left, PolySample right, PolySample& mid, PolySample& side);
+
+    static void ms_to_lr(PolySample mid, PolySample side, PolySample& left, PolySample& right);
+
+    static uint16_t movemask(PolySample expr);
+    
+    bool contains(float val);
+
+    bool containsNans();
+
+    
+
+    
+    
+    static PolySample voiceRotateLeft(PolySample p, uint16_t rot);
+
+    static PolySample voiceRotateRight(PolySample p, uint16_t rot);
+
+    static PolySample voiceRotate(PolySample p, int rot);
+
+    //bool operator==(const PolySample& other);
+
+    
+
     
     
 
     
     
 };
+

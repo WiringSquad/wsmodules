@@ -25,23 +25,27 @@ PolySample::PolySample(float c0, float c1, float c2, float c3,
 }
 
 std::string PolySample::toString(){
-    return "";
+    std::string temp = "";
+    for(int i = 0; i < 16; i++){
+        temp += std::to_string((*this)[i]) + (i != 15 ? ", " : "");
+    }
+    return temp;
 }
 
-void PolySample::polySampleFromInput(Input& inp){
+void PolySample::polySampleFromInput(PolySample& p, Input& inp){
     //inp.readVoltages(temp);
-    chans0_3 = inp.getVoltageSimd<simd::float_4>(0);
-    chans4_7 = inp.getVoltageSimd<simd::float_4>(4);
-    chans8_11 = inp.getVoltageSimd<simd::float_4>(8);
-    chans12_15 = inp.getVoltageSimd<simd::float_4>(12);
+    p.chans0_3 = inp.getVoltageSimd<simd::float_4>(0);
+    p.chans4_7 = inp.getVoltageSimd<simd::float_4>(4);
+    p.chans8_11 = inp.getVoltageSimd<simd::float_4>(8);
+    p.chans12_15 = inp.getVoltageSimd<simd::float_4>(12);
 }
 
-void PolySample::polySampleToOutput(Output& otp){
+void PolySample::polySampleToOutput(const PolySample& p, Output& otp){
     otp.setChannels(16);
-    otp.setVoltageSimd<simd::float_4>(chans0_3, 0);
-    otp.setVoltageSimd<simd::float_4>(chans4_7, 4);
-    otp.setVoltageSimd<simd::float_4>(chans8_11, 8);
-    otp.setVoltageSimd<simd::float_4>(chans12_15, 12);
+    otp.setVoltageSimd<simd::float_4>(p.chans0_3, 0);
+    otp.setVoltageSimd<simd::float_4>(p.chans4_7, 4);
+    otp.setVoltageSimd<simd::float_4>(p.chans8_11, 8);
+    otp.setVoltageSimd<simd::float_4>(p.chans12_15, 12);
 }
 
 PolySample& PolySample::operator=(const float& value){
@@ -284,14 +288,34 @@ PolySample PolySample::operator<=(const PolySample& other) const{
 
 float& PolySample::operator[](size_t index){
     int clampedIndex = rack::clamp((int)index, 0, 15);
-    simd::float_4 vec = (clampedIndex < 4) ? chans0_3 : (clampedIndex < 8) ? chans4_7 : (clampedIndex < 12) ? chans8_11 : chans12_15;
-    return vec[index % 4];
+    if(clampedIndex < 4){
+        return chans0_3[clampedIndex];
+    }
+    else if(clampedIndex < 8){
+        return chans4_7[clampedIndex - 4];
+    }
+    else if(clampedIndex < 12){
+        return chans8_11[clampedIndex - 8];
+    }
+    else{
+        return chans12_15[clampedIndex - 12];
+    }
 }
 
 const float& PolySample::operator[](size_t index) const{
     int clampedIndex = rack::clamp((int)index, 0, 15);
-    simd::float_4 vec = (clampedIndex < 4) ? chans0_3 : (clampedIndex < 8) ? chans4_7 : (clampedIndex < 12) ? chans8_11 : chans12_15;
-    return vec[index % 4];
+    if(clampedIndex < 4){
+        return chans0_3[clampedIndex];
+    }
+    else if(clampedIndex < 8){
+        return chans4_7[clampedIndex - 4];
+    }
+    else if(clampedIndex < 12){
+        return chans8_11[clampedIndex - 8];
+    }
+    else{
+        return chans12_15[clampedIndex - 12];
+    }
 }
 
 PolySample PolySample::sin(PolySample arg){
@@ -570,4 +594,140 @@ PolySample PolySample::abs(PolySample arg){
     result.chans12_15 = simd::abs(arg.chans12_15);
     return result;
 }
+
+PolySample PolySample::log(PolySample arg){
+    PolySample result;
+    result.chans0_3 = simd::log(arg.chans0_3);
+    result.chans4_7 = simd::log(arg.chans4_7);
+    result.chans8_11 = simd::log(arg.chans8_11);
+    result.chans12_15 = simd::log(arg.chans12_15);
+    return result;
+}
+
+PolySample PolySample::log10(PolySample arg){
+    PolySample result;
+    result.chans0_3 = simd::log10(arg.chans0_3);
+    result.chans4_7 = simd::log10(arg.chans4_7);
+    result.chans8_11 = simd::log10(arg.chans8_11);
+    result.chans12_15 = simd::log10(arg.chans12_15);
+    return result;
+}
+
+PolySample PolySample::log2(PolySample arg){
+    PolySample result;
+    result.chans0_3 = simd::log2(arg.chans0_3);
+    result.chans4_7 = simd::log2(arg.chans4_7);
+    result.chans8_11 = simd::log2(arg.chans8_11);
+    result.chans12_15 = simd::log2(arg.chans12_15);
+    return result;
+}
+
+PolySample PolySample::log_arb(PolySample arg, PolySample base){
+    return PolySample::log(arg) / PolySample::log(base);
+}
+
+PolySample PolySample::linear_to_db(PolySample lin){
+    return 20 * PolySample::log10(lin / 10);
+}
+
+PolySample PolySample::db_to_linear(PolySample db){
+    return 10 * PolySample::pow(10, db / 20);
+}
+
+PolySample PolySample::db_scale(PolySample arg, PolySample db){
+    return arg * db_to_linear(db);
+}
+
+void PolySample::pan_triangular(PolySample left, PolySample right, PolySample& leftOut, PolySample& rightOut, PolySample pan){
+    leftOut *= 1 - pan;
+    rightOut *= pan;
+}
+
+void PolySample::pan_circular(PolySample left, PolySample right, PolySample& leftOut, PolySample& rightOut, PolySample pan){
+    leftOut *= (2/sqrtf(3)) * PolySample::sqrt(1 - PolySample::pow(left, 2));
+    rightOut *= (2/sqrtf(3)) * PolySample::sqrt((2*right) - PolySample::pow(right, 2));
+}
+
+void PolySample::lr_to_ms(PolySample left, PolySample right, PolySample& midOut, PolySample& sideOut){
+    midOut = (left + right) * 0.5f;
+    sideOut = (left - right) * 0.5f;
+}
+
+void PolySample::ms_to_lr(PolySample mid, PolySample side, PolySample& leftOut, PolySample& rightOut){
+    leftOut = mid + side;
+    rightOut = mid - side;
+}
+
+uint16_t PolySample::movemask(PolySample expr){
+    uint16_t m1 = simd::movemask(expr.chans0_3);
+    uint16_t m2 = simd::movemask(expr.chans4_7);
+    uint16_t m3 = simd::movemask(expr.chans8_11);
+    uint16_t m4 = simd::movemask(expr.chans12_15);
+    return (m1 << 12) | (m2 << 8) | (m3 << 4) | m4;
+}
+
+bool PolySample::contains(float val){
+    return PolySample::movemask(*this == val) > 0;
+}
+
+bool PolySample::containsNans(){
+    return PolySample::movemask(*this == *this) != 0xffff;
+}
+
+PolySample PolySample::voiceRotateLeft(PolySample p, uint16_t rot){
+    float a[rot];
+    for(int i = 0; i < rot; i++){
+        a[i] = p[i];
+    }
+    for(int i = 0; i < rot; i++){
+        p[i] = p[i + rot];
+    }
+    for(int i = 0; i < rot; i++){
+        p[i + 16 - rot] = a[i];
+    }
+    return p;
+}
+
+PolySample PolySample::voiceRotateRight(PolySample p, uint16_t rot){
+    PolySample result = p;
+    float a[rot];
+    for(int i = 0; i < rot; i++){
+        a[i] = result[i + 16 - rot];
+    }
+    for(int i = 15; i > rot; i--){
+        result[i] = result[i - rot];
+    }
+    for(int i = 0; i < rot; i++){
+        result[i] = a[i];
+    }
+    return result;
+}
+
+PolySample PolySample::voiceRotate(PolySample p, int rot){
+    rot %= 16;
+    if(rot > 0 && rot < 8){
+        return voiceRotateRight(p, rot);
+    }
+    else if(rot >= 8 && rot < 16){
+        return voiceRotateLeft(p, rot - 8);
+    }
+    else if(rot < 0 && rot > -8){
+        return voiceRotateLeft(p, -rot);
+    }
+    else if(rot <= -8 && rot > -16){
+        return voiceRotateRight(p, -8 - rot);
+    }
+    else{
+        return p;
+    }
+}
+
+
+
+
+
+/*bool PolySample::operator==(const PolySample& other){
+    return PolySample::movemask(*this == other) == 0xffff;
+}*/
+
 

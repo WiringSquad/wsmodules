@@ -40,6 +40,15 @@ enum class PolyLiterals{
     LITERS_LEN
 };
 
+enum class PolyOperations{
+    SHIFT,
+    MUL,
+    INTERLEAVE,
+    ROTATE,
+    INTERPOLATE,
+    OPERS_LEN
+};
+
 inline PolySample getPolyLiteral(PolyLiterals lit){
     switch(lit){
         case PolyLiterals::ZEROES:
@@ -69,5 +78,20 @@ inline PolySample getPolyLiteral(PolyLiterals lit){
             return PolySample(1.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f);
         default:
             return PolySample(0.f); 
+    }
+}
+
+inline PolySample getPolyOperation(PolySample lhs, PolySample rhs, PolySample itl, PolyOperations op){
+    switch(op){
+        case PolyOperations::SHIFT:
+            return lhs + rhs;
+        case PolyOperations::MUL:
+            return lhs * rhs;
+        case PolyOperations::INTERLEAVE:
+            return PolySample::ifelse(lhs, rhs, itl);
+        case PolyOperations::ROTATE:
+            return PolySample::voiceRotate(lhs, (int)rhs[0]);
+        case PolyOperations::INTERPOLATE:
+            return itl[0] * lhs + (1 - itl[0]) * rhs;
     }
 }
